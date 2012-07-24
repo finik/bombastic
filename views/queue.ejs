@@ -1,0 +1,151 @@
+<script data-main="js/queue.js" src="js/libs/require.min.js"></script>
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="/"><%= title %></a>
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li class="active"><a href="/">Checker queue</a></li>
+          <li><a href="/submit">Submit new</a></li>
+        </ul>
+        <ul class="nav pull-right">
+          <li class=""><a href="#" class="userinfo"><%= user.name %> (<%= user.email %>)</a></li>
+          <li class="divider-vertical"></li>
+          <li class=""><a href="#" class="logout">Sign out</a></li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+
+	<div class="row">
+		<div class="span12">
+			<input type="hidden" id="project" value="<%= current %>">
+			<select id="project" class="pull-right">
+				<% for (project in projects) {
+						if (current == project) { %>
+						<option selected="selected"><%= project %></option>
+					<% } else { %>
+						<option><%= project %></option>
+					<% } %>
+				<% } %>
+			</select>
+		</div>
+	</div>
+	<h1>Pending</h1><br>
+  <% if (pending.length > 0) {
+    pending.forEach(function(request){ %>
+    <div class="row">
+      <div class="span2">
+        <span class="id hide"><%= request._id %></span>
+        <% if (request.status === 'testing') { %><div class="alert">Testing (<a href="<%= request.job.url %>console" target="_blank">view log</a>)</div><% } %>
+        <% if (request.status === 'approved') { %><div class="alert">Approved</div><% } %>
+        <a href="/api/get/<%= request._id %>" title="Generate XML" class="generate"><i class="icon-download-alt"></i></a>
+        <a href="#" title="Approve change now!" class="approve pull-right"><i class="icon-ok"></i></a>
+        <a href="#" title="Drop change" class="remove pull-right"><i class="icon-remove"></i></a><br>
+        <strong><a href="mailto:<%= request.author.email %>"><%= request.author.name %></a></strong><br>
+        <%= request.date.toTimeString() %><br>
+        <%= request.date.toDateString() %><br>
+        <strong>Description:</strong><br><%= request.message %><br>
+
+      </div>
+      <div class="span9 well">
+        <table class="table">
+        <thead>
+          <tr>
+            <td><strong>Action</strong></td>
+            <td><strong>Name</strong></td>
+            <td><strong>Path</strong></td>
+            <td><strong>Groups</strong></td>
+            <td><strong>Remote</strong></td>
+            <td><strong>Revision</strong></td>
+          </tr>
+        </thead>
+        <tbody>
+            <% request.changes.forEach(function(project){ %>
+              <tr class="project">
+              <td class="action"><%= project.action %></td>
+              <td class="name"><%= project.name %></td>
+              <td class="path"><%= (project.path)?project.path:"" %></td>
+              <td class="groups"><%= (project.groups)?project.groups:"" %></td>
+              <td class="remote"><%= (project.remote)?project.remote:"" %></td>
+              <td class="revision"><%= (project.revision)?project.revision:"" %></td>
+              </tr>
+            <% }) %>
+        </tbody>
+        </table>
+      </div>
+    </div>
+  <% }); } else { %>
+    <div class="row">
+      <div class="span12">
+        <div class="alert alert-error">Alert! My pending queue is empty. Is it a holiday?</div>
+      </div>
+    </div>
+  <% } %>
+
+  <h1>Processed</h1><br>
+  <% if (processed.length > 0) {
+    processed.forEach(function(request){ %>
+    <div class="row">
+      <div class="span2">
+        <span class="id hide"><%= request._id %></span>
+        <% if (request.status === 'commited') { %><div class="alert alert-success">Commited (<a href="<%= request.job.url %>console" target="_blank">view log</a>)</div><% } %>
+        <% if (request.status === 'failed') { %><div class="alert alert-error">Failed (<a href="<%= request.job.url %>console" target="_blank">view log</a>)</div><% } %>
+        <strong><a href="mailto:<%= request.author.email %>"><%= request.author.name %></a></strong><br>
+        <%= request.date.toTimeString() %><br>
+        <%= request.date.toDateString() %><br>
+        <strong>Description:</strong><br><%= request.message %><br>
+
+      </div>
+      <div class="span9 well">
+        <table class="table">
+        <thead>
+          <tr>
+            <td><strong>Action</strong></td>
+            <td><strong>Name</strong></td>
+            <td><strong>Path</strong></td>
+            <td><strong>Groups</strong></td>
+            <td><strong>Remote</strong></td>
+            <td><strong>Revision</strong></td>
+          </tr>
+        </thead>
+        <tbody>
+            <% request.changes.forEach(function(project){ %>
+              <tr class="project">
+              <td class="action"><%= project.action %></td>
+              <td class="name"><%= project.name %></td>
+              <td class="path"><%= (project.path)?project.path:"" %></td>
+              <td class="groups"><%= (project.groups)?project.groups:"" %></td>
+              <td class="remote"><%= (project.remote)?project.remote:"" %></td>
+              <td class="revision"><%= (project.revision)?project.revision:"" %></td>
+              </tr>
+            <% }) %>
+        </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="row">
+      <div class="span12"><hr></div>
+    </div>
+  <% }); } else { %>
+    <div class="row">
+      <div class="span12">
+        <div class="alert alert-error">Alert! My processed queue is empty. Now you should worry!</div>
+      </div>
+    </div>
+  <% } %>
+
+
+  <footer>
+    <p>&copy; Company 2012</p>
+  </footer>
+
+</div> <!-- /container -->

@@ -1,0 +1,188 @@
+<script data-main="js/submit.js" src="js/libs/require.min.js"></script>
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="/"><%= title %></a>
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li><a href="/">Checker queue</a></li>
+          <li class="active"><a href="/submit">Submit new</a></li>
+        </ul>
+        <ul class="nav pull-right">
+          <li class=""><a href="#" class="userinfo"><%= user.name %> (<%= user.email %>)</a></li>
+          <li class="divider-vertical"></li>
+          <li class=""><a href="#" class="logout">Sign out</a></li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="span12">
+      <input type="hidden" id="project" value="<%= current %>">
+      <select id="project" class="pull-right">
+        <% for (project in projects) {
+            if (current == project) { %>
+            <option selected="selected"><%= project %></option>
+          <% } else { %>
+            <option><%= project %></option>
+          <% } %>
+        <% } %>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="span12">
+      <h1>Pending changes</h1>
+      <table class="table">
+        <thead>
+          <tr>
+            <td><strong></strong></td>
+            <td><strong>Action</strong></td>
+            <td><strong>Name</strong></td>
+            <td><strong>Path</strong></td>
+            <td><strong>Groups</strong></td>
+            <td><strong>Remote</strong></td>
+            <td><strong>Revision</strong></td>
+          </tr>
+        </thead>
+        <tbody class="pending">
+        </tbody>
+      </table>
+      <hr>
+      <div class="row">
+        <div class="span6">
+          <a class="btn" href="#" id="add-component">Add brand new component</a><br>
+        </div>
+        <div class="span6">
+          <label>Message</label>
+          <textarea class="input-xlarge span6" id="message" rows="3"></textarea><br>
+          <a class="btn btn-primary pull-right" href="#" id="submit-bom">Submit</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="span12"><h1>Current manifest</h1></div>
+  </div>
+  <div class="row">
+    <div class="span6">
+      <p>This is the current state of the manifest. Not all fields are populated for all components, when a field is empty, there resulting XML will not have
+        the field at all and default values will be used.</p>
+      <p>Definitions for defaults, as well as declaration of remote servers etc can not be modified through bom-bastic, you must have access and edit the xml manually for that.</p>
+      <p>If it is existing component you are about to delete or modify, locate the component in the table below and click on either <i class="icon-pencil"></i> or
+      <i class="icon-trash"></i> buttons. To add new component to the build, press the "Add component" button at the top of the page.</p>
+    </div>
+    <div class="span6">
+      <strong>Last commit:</strong>
+      <table class="table table-condensed well">
+        <tbody>
+          <tr><td><strong>Commit</strong></td><td><%= commit.commit %></td></tr>
+          <tr><td><strong>Author</strong></td><td><%= commit.author %></td></tr>
+          <tr><td><strong>Date</strong></td><td><%= commit.date %></td></tr>
+          <tr><td><strong>Message</strong></td><td><%= commit.message %></td></tr>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="row">
+    <div class="span12">
+      <table class="table" id="datatable">
+        <thead>
+          <tr>
+            <td><strong></strong></td>
+            <td><strong>Action</strong></td>
+            <td><strong>Name</strong></td>
+            <td><strong>Path</strong></td>
+            <td><strong>Groups</strong></td>
+            <td><strong>Remote</strong></td>
+            <td><strong>Revision</strong></td>
+          </tr>
+        </thead>
+        <tbody class="original">
+          <% manifest.manifest.project.forEach(function(project){ %>
+            <tr class="project">
+            <td class="restore"><div style="display:none"><a href="#" class="restore" title="Restore"><i class="icon-remove"></i></a></div></td>
+            <td class="action"><div><a href="#" class="modify" title="Modify"><i class="icon-pencil"></i></a> <a href="#" class="remove" title="Remove"><i class="icon-trash"></i></a></div></td>
+            <td class="name"><%= project.name %></td>
+            <td class="path"><%= (project.path)?project.path:"" %></td>
+            <td class="groups"><%= (project.groups)?project.groups:"" %></td>
+            <td class="remote"><%= (project.remote)?project.remote:"" %></td>
+            <td class="revision"><%= (project.revision)?project.revision:"" %></td>
+            </tr>
+          <% }) %>
+            <tr class="project hide" id="tr-template">
+            <td class="restore"><div><a href="#" class="restore" title="Restore"><i class="icon-remove"></i></a></div></td><td class="action"><div>Add</div></td>
+            <td class="name">/td><td class="path"></td><td class="groups"></td><td class="remote"></td><td class="revision"></td>
+            </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal hide fade" id="editModal">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">×</button>
+      <h3>Modify component</h3>
+    </div>
+    <div class="modal-body">
+      <form>
+        <label>Name</label>
+        <input type="text" class="span5" id="modify-name" readonly="readonly">
+        <label>Path</label>
+        <input type="text" class="span5" id="modify-path">
+        <label>Groups</label>
+        <input type="text" class="span5" id="modify-groups">
+        <label>Remote</label>
+        <input type="text" class="span5" id="modify-remote">
+        <label>Revision</label>
+        <input type="text" class="span5" id="modify-revision">
+      </form>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+      <a href="#" class="btn btn-primary" id="modify-ok">OK</a>
+    </div>
+  </div>
+
+  <div class="modal hide fade" id="addModal">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">×</button>
+      <h3>Add new component</h3>
+    </div>
+    <div class="modal-body">
+      <form>
+        <label>Name</label>
+        <input type="text" class="span5" id="add-name">
+        <label>Path</label>
+        <input type="text" class="span5" id="add-path">
+        <label>Groups</label>
+        <input type="text" class="span5" id="add-groups">
+        <label>Remote</label>
+        <input type="text" class="span5" id="add-remote">
+        <label>Revision</label>
+        <input type="text" class="span5" id="add-revision">
+      </form>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+      <a href="#" class="btn btn-primary" id="add-ok">OK</a>
+    </div>
+  </div>
+
+  <hr>
+
+  <footer>
+    <p>&copy; Company 2012</p>
+  </footer>
+
+</div> <!-- /container -->

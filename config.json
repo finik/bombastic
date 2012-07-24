@@ -1,0 +1,33 @@
+{
+	"title": 		"BOM-BASTIC",
+	"description": 	"BOM Submission Checker",
+	"author": 	 	"Dmitry Fink",
+	"port": 	 	 	"4000",
+	"ldap": {
+		"url": "ldaps://ldaps.example.com:636",
+		"adminDn": "",
+		"adminPassword": "",
+		"searchBase": "",
+		"searchFilter": ""
+	},
+	"jenkins": {
+		"url": "http://jenkins.example.com",
+	},
+	"logging": {
+		"file": "/path/to/bombastic.log"
+	},
+	"projects": {
+		"phone": {
+			"name":				"phone",
+			"manifestPath": 	"/path/to/phone/manifest/folder/",
+			"manifestFile": 	"default.xml",
+			"job": 				"jenkins_phone_build"
+		},
+		"tablet": {
+			"name":				"tablet",
+			"manifestPath": 	"/path/to/tablet/manifest/folder/",
+			"manifestFile": 	"default.xml",
+			"job": 				"jenkins_tablet_build"
+		}
+	}
+}

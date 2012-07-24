@@ -1,0 +1,49 @@
+<script data-main="js/login.js" src="js/libs/require.min.js"></script>
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="/"><%= title %></a>
+      <div class="nav-collapse">
+        <ul class="nav">
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+
+  <div class="modal hide fade" id="loginModal">
+    <div class="modal-header">
+      <h3>Log in</h3>
+    </div>
+    <div class="modal-body">
+      <div class="raw">
+        <div class="span2">
+          <form>
+            <label>AID/XID:</label>
+            <input type="text" class="span2" id="loginbox">
+            <label>Password:</label>
+            <input type="password" class="span2" id="passwordbox">
+          </form>
+        </div>
+        <div class="span2">
+         <div class="alert alert-error" id="alert" style="display:none">Error signing in, should you really be here?</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn btn-primary" id="login">Login</a>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; Company 2012</p>
+  </footer>
+
+</div> <!-- /container -->

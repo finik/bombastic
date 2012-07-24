@@ -1,0 +1,33 @@
+{
+  "name": "bombastic",
+  "version": "0.1.0",
+  "description": "Android manifest automation server",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/finik/bombastic.git"
+  },
+  "keywords": [
+    "bom",
+    "manifest",
+    "android",
+    "jenkins"
+  ],
+  "author": "Dmitry Fink",
+  "license": "BSD",
+  "dependencies": {
+    "express": "2.5.10",
+    "winston": "0.6.2",
+    "ejs": "0.7.2",
+    "xml2json": "git://github.com/buglabs/node-xml2json.git#21d83850bf8ab831a7bb15d1b417b786592cfa8d",
+    "mongodb": "1.0.2",
+    "temp": "0.4.0",
+    "ldapauth": "git://github.com/finik/node-ldapauth.git#617c57c0624017bf976523d81bb55adbddfdddc4",
+    "pretty-data": "0.40.0",
+    "request": "2.9.203"
+  }
+}
