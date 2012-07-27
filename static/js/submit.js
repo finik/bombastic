@@ -90,11 +90,6 @@ require([
         });
       }));
 
-      $('#datatable').dataTable({
-        "sDom": "<'row'<'span12'f>r><'row'<'span6'i><'span6'p>>t<'row'<'span6'i><'span6'p>>",
-        "sPaginationType": "bootstrap"
-      });
-
       $('#modify-ok').click(function() {
         $project_tr.find('td.action>div').html('Modify');
         $project_tr.find('td.restore>div').show();
@@ -132,6 +127,8 @@ require([
         request = {};
 
         $('tbody.pending>tr').each(function(index, element){
+          if ($(this).hasClass('hide')) return;
+
           component = {};
           component.action = $(this).find('td.action>div').text();
           component.name = $(this).children('td.name').text();
@@ -173,7 +170,13 @@ require([
         });
 
 
-      })
+      });
+
+      $('#datatable').dataTable({
+        "sDom": "<'row'<'span12'f>r><'row'<'span6'i><'span6'p>>t<'row'<'span6'i><'span6'p>>",
+        "sPaginationType": "bootstrap"
+      });
+
     });
   });
 

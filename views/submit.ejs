@@ -54,6 +54,10 @@
           </tr>
         </thead>
         <tbody class="pending">
+          <tr class="project hide" id="tr-template">
+          <td class="restore"><div><a href="#" class="restore" title="Restore"><i class="icon-remove"></i></a></div></td><td class="action"><div>Add</div></td>
+          <td class="name">/td><td class="path"></td><td class="groups"></td><td class="remote"></td><td class="revision"></td>
+          </tr>
         </tbody>
       </table>
       <hr>
@@ -120,10 +124,6 @@
             <td class="revision"><%= (project.revision)?project.revision:"" %></td>
             </tr>
           <% }) %>
-            <tr class="project hide" id="tr-template">
-            <td class="restore"><div><a href="#" class="restore" title="Restore"><i class="icon-remove"></i></a></div></td><td class="action"><div>Add</div></td>
-            <td class="name">/td><td class="path"></td><td class="groups"></td><td class="remote"></td><td class="revision"></td>
-            </tr>
         </tbody>
       </table>
     </div>
