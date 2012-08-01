@@ -3,8 +3,34 @@ var fs = require('fs');
 var pd = require('pretty-data').pd;
 var log = require('./logger');
 
-object2xml = function(data) {
-	return pd.xml(parser.toXml(data));
+object2xml = function(manifestObject) {
+	var project;
+	var external = {};
+	external.project = [];
+
+	var length = manifestObject.manifest.project.length;
+	for (i = 0; i < length; i++) {
+		project = manifestObject.manifest.project[i];
+		if (project.external) {
+			delete project.external;
+			delete project.path;
+			external.project.push(project);
+			manifestObject.manifest.project[i] = undefined;
+		}
+	}
+
+	if (external.project.length > 0) {
+		manifestObject.manifest.external = external;
+
+		// Cleanup main project array
+		for (i = length; i > 0; i--) {
+			if (manifestObject.manifest.project[i] == undefined) {
+				manifestObject.manifest.project.splice(i, 1);
+			}
+		}
+	}
+
+	return pd.xml(parser.toXml(manifestObject));
 }
 exports.object2xml = object2xml;
 
@@ -17,7 +43,18 @@ exports.readObject = function(path, file, callback) {
 		}
 		// Send a method response with a value
 		var json = parser.toJson(data.toString(), {reversible: true});
-		callback(err, JSON.parse(json));
+		var manifestObject = JSON.parse(json);
+
+		if (manifestObject.manifest.external) {
+			while (manifestObject.manifest.external.project.length > 0) {
+				var project = manifestObject.manifest.external.project.shift();
+				project.external = true;
+				project.path = 'N/A';
+				manifestObject.manifest.project.push(project);
+			}
+		}
+
+		callback(err, manifestObject);
 	});
 }
 
