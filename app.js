@@ -106,7 +106,11 @@ exports.init = function() {
 				res.json({success: false});
 			} else {
 				req.session.user = user;
-				req.session.project = config.projects['omap5tevm'];
+				for (project in config.projects) {
+					req.session.project = config.projects[project];
+					break;
+				}
+
 				res.json({success: true});
 			}
 		});
