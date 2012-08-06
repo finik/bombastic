@@ -23,7 +23,7 @@
     "express": "2.5.10",
     "winston": "0.6.2",
     "ejs": "0.7.2",
-    "xml2json": "git://github.com/buglabs/node-xml2json.git#21d83850bf8ab831a7bb15d1b417b786592cfa8d",
+    "xml2json": "git://github.com/finik/node-xml2json.git#5051c6513ba35b9499d1ab8b40f430897a338102",
     "mongodb": "1.0.2",
     "temp": "0.4.0",
     "ldapauth": "git://github.com/finik/node-ldapauth.git#617c57c0624017bf976523d81bb55adbddfdddc4",
