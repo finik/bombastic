@@ -45,14 +45,14 @@
     <div class="row">
       <div class="span2">
         <span class="id hide"><%= request._id %></span>
-        <% if (request.status === 'testing') { %><div class="alert">Testing (<a href="<%= request.job.url %>console" target="_blank">view log</a>)</div><% } %>
-        <% if (request.status === 'approved') { %><div class="alert">Approved</div><% } %>
         <a href="/api/get/<%= request._id %>" title="Generate XML" class="generate"><i class="icon-download-alt"></i></a>
         <a href="#" title="Approve change now!" class="approve pull-right"><i class="icon-ok"></i></a>
         <a href="#" title="Drop change" class="remove pull-right"><i class="icon-remove"></i></a><br>
         <strong><a href="mailto:<%= request.author.email %>"><%= request.author.name %></a></strong><br>
         <%= request.date.toTimeString() %><br>
         <%= request.date.toDateString() %><br>
+        <% if (request.status === 'testing') { %><div class="alert-info">Testing (<a href="<%= request.job.url %>console" target="_blank">view log</a>)</div><% } %>
+        <% if (request.status === 'approved') { %><div class="alert-info">Approved (<a href="<%= request.job.url %>console" target="_blank">view log</a>)</div><% } %>
         <strong>Description:</strong><br><%= request.message %><br>
 
       </div>
@@ -97,11 +97,12 @@
     <div class="row">
       <div class="span2">
         <span class="id hide"><%= request._id %></span>
-        <% if (request.status === 'commited') { %><div class="alert alert-success">Commited (<a href="<%= request.job.url %>console" target="_blank">view log</a>)</div><% } %>
-        <% if (request.status === 'failed') { %><div class="alert alert-error">Failed (<a href="<%= request.job.url %>console" target="_blank">view log</a>)</div><% } %>
+        <% if (request.status === 'failed') { %><a href="#" title="Resubmit change" class="resubmit pull-right"><i class="icon-repeat"></i></a><br><% } %>
         <strong><a href="mailto:<%= request.author.email %>"><%= request.author.name %></a></strong><br>
         <%= request.date.toTimeString() %><br>
         <%= request.date.toDateString() %><br>
+        <% if (request.status === 'commited') { %><div class="alert-success">Commited (<a href="<%= request.job.url %>console" target="_blank">view log</a>)</div><% } %>
+        <% if (request.status === 'failed') { %><div class="alert-error">Failed (<a href="<%= request.job.url %>console" target="_blank">view log</a>)</div><% } %>
         <strong>Description:</strong><br><%= request.message %><br>
 
       </div>
