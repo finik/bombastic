@@ -67,6 +67,12 @@ require([
         $project_tr = $original_tr.clone();
         $('#modify-name').val($project_tr.children('td.name').text());
         $('#modify-path').val($project_tr.children('td.path').text());
+        if ($project_tr.children('td.path').text() == 'N/A') {
+          $('#modify-path').attr('readonly', true);
+        }
+        else {
+          $('#modify-path').removeAttr('readonly');
+        }
         $('#modify-groups').val($project_tr.children('td.groups').text());
         $('#modify-revision').val($project_tr.children('td.revision').text());
         $('#editModal').modal('show');
