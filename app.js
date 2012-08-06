@@ -142,12 +142,37 @@ exports.init = function() {
 		});
 	});
 
+	app.post('/api/resubmit', function(req, res){
+		if (undefined == req.session.user) {
+			log.error('Illegal submit request, no active user!');
+			res.json({success: false});
+		}
+		workqueue.get(req.body.id, function(err, request) {
+			if (request == undefined) {
+				log.error("Can not find change %d", req.params.id);
+				return;
+			}
+			// Resubmit the exact same request, reset id, state and author
+			delete request._id;
+			request.pending = true;
+			request.status = 'waiting';
+			request.author.name = req.session.user.fullName;
+			request.author.email = req.session.user.mail;
+			workqueue.schedule(request, function(err, id) {
+				jenkins.build(req.session.project.job, {BOMBASTIC_ID: id}, function(err, result) {
+					res.json({success: true});
+				});
+			});
+		});
+	});
+
+
 	app.post('/api/delete', function(req, res){
 		if (undefined == req.session.user) {
 			log.error('Unauthorized POST access to /api/delete');
 			res.json({success: false});
 		}
-		log.warning('Deleting ' + req.params.id);
+		log.warn('Deleting ' + req.params.id);
 		workqueue.delete(req.body.id, function(err) {
 			 res.json({success: true});
 		 });
@@ -208,7 +233,7 @@ exports.init = function() {
 			res.json({success: false});
 		}
 		id = req.body.id;
-		log.warning('Force approving ' + id);
+		log.warn('Force approving ' + id);
 		workqueue.get(id, function(err, request){
 			if (request == undefined) {
 				log.error("Can not find change %d", id);

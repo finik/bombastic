@@ -56,7 +56,7 @@ exports.get = function(id, callback) {
 
 exports.delete = function(id, callback) {
 	queue.remove({_id: new ObjectID(id)}, {safe:true}, function(err, number) {
-		log.warning('Deleting ' + id)
+		log.warn('Deleting ' + id)
 		callback(err);
 	});
 }

@@ -41,6 +41,18 @@ require([
         });
       });
 
+      $('a.resubmit').click(function() {
+        $this = $(this);
+        id = $this.parent().children('span.id').text();
+         $.post('/api/resubmit', {id: id}, function(data) {
+          if (data.success) {
+            document.location.href = '/';
+          } else {
+            alert('Something went wrong, server returned error');
+          }
+        });
+      });
+
       $('a.logout').click(function() {
         $this = $(this);
         $.post('/api/logout', {}, function(data) {
