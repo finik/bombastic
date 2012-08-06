@@ -1,4 +1,5 @@
 var express = require('express');
+var request = require('request');
 var app = express.createServer();
 var git = require('./git');
 var workqueue = require('./workqueue');
@@ -177,6 +178,27 @@ exports.init = function() {
 					res.send(manifest.object2xml(data));
 				}
 			});
+		});
+	});
+
+	app.get('/api/clean', function(req, res){
+		// This doesn't have a session associated with it,
+		// it can't rely on any session variables, only on
+		// data that came with the request itself.
+		log.info('Someone is fetching a clean version of ' + req.query.url);
+		request({
+			method: 'get',
+			uri: req.query.url,
+			qs: {}
+		}, function (err, result) {
+			if (err) {
+				log.err('Can not retrieve ' + req.query.url);
+			} else {
+				data = manifest.xml2object(result.body);
+				// Convert back to xml and send
+				res.header('Content-Type', 'text/xml');
+				res.send(manifest.object2xml(data));
+			}
 		});
 	});
 

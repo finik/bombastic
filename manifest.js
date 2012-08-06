@@ -34,6 +34,21 @@ object2xml = function(manifestObject) {
 }
 exports.object2xml = object2xml;
 
+xml2object = function(xml) {
+	// Send a method response with a value
+	var json = parser.toJson(xml, {reversible: true});
+	var manifestObject = JSON.parse(json);
+
+	var length = manifestObject.manifest.project.length;
+	for (i = 0; i < length; i++) {
+		project = manifestObject.manifest.project[i];
+		delete project.groups;
+	}
+
+	return manifestObject;
+}
+exports.xml2object = xml2object;
+
 
 exports.readObject = function(path, file, callback) {
 	fs.readFile(path + file, function(err, data){
