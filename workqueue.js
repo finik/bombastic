@@ -9,8 +9,7 @@ var server;
 var db;
 var queue;
 
-exports.init = function() {
-	console.log(config.mongodb.port);
+exports.init = function(callback) {
 	server = new Server(config.mongodb.host, parseInt(config.mongodb.port), {auto_reconnect: true});
 	db = new Db(config.mongodb.database, server);
 
@@ -21,6 +20,7 @@ exports.init = function() {
 		// Creating queue collection if it doesn't exist yet
 		db.createCollection('queue', function(err, collection) {
 			queue = collection;
+			callback(err);
 			return true;
 		});
 	  }

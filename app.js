@@ -12,11 +12,18 @@ var log = require('./logger');
 
 exports.init = function() {
 
-	workqueue.init();
+	workqueue.init(function(err) {
+		if (err) {
+			log.error('Error initializing workqueue');
+			return false;
+		}
 
-	for (project_id in config.projects) {
-		updatertask.init(config.projects[project_id]);
-	}
+		for (project_id in config.projects) {
+			updatertask.init(config.projects[project_id]);
+		}
+	});
+
+
 
 	app.configure(function(){
 		app.set('views', __dirname + '/views');
