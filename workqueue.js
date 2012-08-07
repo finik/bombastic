@@ -1,3 +1,4 @@
+var config = require('./config');
 var mongo = require('mongodb'),
   Server = mongo.Server,
   Db = mongo.Db,
@@ -9,8 +10,9 @@ var db;
 var queue;
 
 exports.init = function() {
-	server = new Server('localhost', 27017, {auto_reconnect: true});
-	db = new Db('bombastic', server);
+	console.log(config.mongodb.port);
+	server = new Server(config.mongodb.host, parseInt(config.mongodb.port), {auto_reconnect: true});
+	db = new Db(config.mongodb.database, server);
 
 	db.open(function(err, db) {
 	  if(!err) {
