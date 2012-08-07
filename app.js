@@ -52,7 +52,10 @@ exports.init = function() {
 		workqueue.getQueue(req.session.project.name, function(pending, processed) {
 			res.render('queue', {
 				title: config.title,
-				user: {name: req.session.user.fullName, email: req.session.user.mail},
+				user: {
+					name: req.session.user.fullName,
+					email: req.session.user.mail,
+					admin: (req.session.project.admins.indexOf(req.session.user.mail) != -1)},
 				projects: config.projects,
 				current: req.session.project.name,
 				pending: pending,
@@ -89,7 +92,10 @@ exports.init = function() {
 
 				res.render('submit', {
 							title: config.title,
-							user: {name: req.session.user.fullName, email: req.session.user.mail},
+							user: {
+								name: req.session.user.fullName,
+								email: req.session.user.mail,
+								admin: (req.session.project.admins.indexOf(req.session.user.mail) != -1)},
 							commit: commit,
 							projects: config.projects,
 							current: req.session.project.name,

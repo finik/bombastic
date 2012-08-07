@@ -46,8 +46,8 @@
       <div class="span2">
         <span class="id hide"><%= request._id %></span>
         <a href="/api/get/<%= request._id %>" title="Generate XML" class="generate"><i class="icon-download-alt"></i></a>
-        <a href="#" title="Approve change now!" class="approve pull-right"><i class="icon-ok"></i></a>
-        <a href="#" title="Drop change" class="remove pull-right"><i class="icon-remove"></i></a><br>
+        <% if (user.admin) { %><a href="#" title="Approve change now!" class="approve pull-right"><i class="icon-ok"></i></a><% } %>
+        <% if (user.admin) { %><a href="#" title="Drop change" class="remove pull-right"><i class="icon-remove"></i></a><br><% } %>
         <strong><a href="mailto:<%= request.author.email %>"><%= request.author.name %></a></strong><br>
         <%= request.date.toTimeString() %><br>
         <%= request.date.toDateString() %><br>
