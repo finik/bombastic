@@ -67,31 +67,37 @@ update = function(project, id, request, build, workqueue) {
 
 
 updaterTask = function(project, timeout) {
-
-	jenkins.job(project.job, function(err, data) {
+	workqueue.getPendingQueue(project.name, function(err, pending) {
 		if (err) {
-			log.error('Error getting build list');
+			log.error('Error getting pending list');
+		} else if (pending.length < 0) {
+			// do nothing
+		} else {
+			jenkins.job(project.job, function(err, data) {
+				if (err) {
+					log.error('Error getting build list');
+				}
+				else {
+					for (n in data.builds) {
+						var build = data.builds[n];
+						var params = build.actions[0].parameters;
+						for (pair in params) {
+							if (params[pair].name === 'BOMBASTIC_ID') {
+								var id = params[pair].value;
+							}
+						}
+
+						for (m in pending) {
+							request = pending[m];
+
+							if (request._id == id) {
+								update(project, id, request, build, workqueue);
+							}
+						}
+					}
+				}
+			});
 		}
-
-		workqueue.getPendingQueue(project.name, function(err, pending) {
-			for (n in data.builds) {
-				var build = data.builds[n];
-				var params = build.actions[0].parameters;
-				for (pair in params) {
-					if (params[pair].name === 'BOMBASTIC_ID') {
-						var id = params[pair].value;
-					}
-				}
-
-				for (m in pending) {
-					request = pending[m];
-
-					if (request._id == id) {
-						update(project, id, request, build, workqueue);
-					}
-				}
-			}
-		});
 	});
 
 	setTimeout(function() {
