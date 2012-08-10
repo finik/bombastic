@@ -26,7 +26,7 @@ exports.commit = function (path, author, message, callback) {
 		log.debug('Write commit message into temporary file ' + info.path);
 		fs.write(info.fd, message);
 		fs.close(info.fd, function(err) {
-			var command = ['./scripts/commit.sh ',
+			var command = [__dirname + '/scripts/commit.sh ',
 				path,
 				'  "',
 				author.name,
