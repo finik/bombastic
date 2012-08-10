@@ -167,7 +167,7 @@ exports.init = function() {
 			}
 			// Resubmit the exact same request, reset id, state and author
 			delete request._id;
-			delete.request.job;
+			delete request.job;
 			request.pending = true;
 			request.status = 'waiting';
 			request.author.name = req.session.user.fullName;
