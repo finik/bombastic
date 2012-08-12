@@ -1,3 +1,4 @@
+var _ = require('underscore');
 var express = require('express');
 var request = require('request');
 var app = express.createServer();
@@ -18,9 +19,9 @@ exports.init = function() {
 			return false;
 		}
 
-		for (project_id in config.projects) {
-			updatertask.init(config.projects[project_id]);
-		}
+		_.each(config.projects, function(project) {
+			updatertask.init(project);
+		});
 
 		return true;
 	});
@@ -103,7 +104,7 @@ exports.init = function() {
 					mail : "dummy@example.com",
 					admin: true
 				};
-				req.session.project = config.projects[Object.keys(config.projects)[0]];
+				req.session.project = config.projects[_.keys(config.projects)[0]];
 			} else {
 				log.info('Need to log in, redirect to /login');
 				res.redirect('/login');
