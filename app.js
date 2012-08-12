@@ -21,6 +21,8 @@ exports.init = function() {
 		for (project_id in config.projects) {
 			updatertask.init(config.projects[project_id]);
 		}
+
+		return true;
 	});
 
 
@@ -37,20 +39,20 @@ exports.init = function() {
 	});
 
 	app.configure('development', function(){
-	   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+		app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 		// app.use(express.logger({ format: ':method :url' }));
 	});
 
 	app.configure('production', function(){
-	   app.use(express.errorHandler());
+		app.use(express.errorHandler());
 	});
 
 	app.error(function(err, req, res, next){
-	   res.render('500.ejs', { locals: { error: err },status: 500 });
+		res.render('500.ejs', { locals: { error: err },status: 500 });
 	});
 
 	app.get('/', function(req, res) {
-		if (undefined == req.session.user) {
+		if (undefined === req.session.user) {
 			log.info('Need to log in, redirect to /login');
 			res.redirect('/login');
 			return;
@@ -73,19 +75,19 @@ exports.init = function() {
 	});
 
 	app.get('/login', function(req, res) {
-		if (undefined != req.session.user) {
+		if (undefined !== req.session.user) {
 			log.info('Already logged in, redirect to /');
 			res.redirect('/');
 			return;
 		}
 
 		res.render('login', {
-			title: config.title,
+			title: config.title
 		});
 	});
 
 	app.get('/submit', function(req, res){
-		if (undefined == req.session.user) {
+		if (undefined === req.session.user) {
 			log.info('Need to log in, redirect to /logn');
 			res.redirect('/login');
 			return;
@@ -136,7 +138,7 @@ exports.init = function() {
 	});
 
 	app.post('/api/submit', function(req, res){
-		if (undefined == req.session.user) {
+		if (undefined === req.session.user) {
 			log.error('Illegal submit request, no active user!');
 			res.json({success: false});
 		}
@@ -156,12 +158,12 @@ exports.init = function() {
 	});
 
 	app.post('/api/resubmit', function(req, res){
-		if (undefined == req.session.user) {
+		if (undefined === req.session.user) {
 			log.error('Illegal submit request, no active user!');
 			res.json({success: false});
 		}
 		workqueue.get(req.body.id, function(err, request) {
-			if (request == undefined) {
+			if (request === undefined) {
 				log.error("Can not find change %d", req.params.id);
 				return;
 			}
@@ -182,14 +184,14 @@ exports.init = function() {
 
 
 	app.post('/api/delete', function(req, res){
-		if (undefined == req.session.user) {
+		if (undefined === req.session.user) {
 			log.error('Unauthorized POST access to /api/delete');
 			res.json({success: false});
 		}
 		log.warn('Deleting ' + req.params.id);
 		workqueue.delete(req.body.id, function(err) {
-			 res.json({success: true});
-		 });
+			res.json({success: true});
+		});
 	});
 
 	app.get('/api/get/:id', function(req, res){
@@ -198,7 +200,7 @@ exports.init = function() {
 		// data that came with the request itself.
 		log.info('Someone is fetching a fresh manifest with changes from ' + req.params.id);
 		workqueue.get(req.params.id, function(err, request) {
-			if (request == undefined) {
+			if (request === undefined) {
 				log.error("Can not find change %d", req.params.id);
 				return;
 			}
@@ -211,7 +213,7 @@ exports.init = function() {
 					return;
 				}
 
-				if (true == manifest.applyChanges(data, request)) {
+				if (true === manifest.applyChanges(data, request)) {
 					// Convert back to xml and send
 					res.header('Content-Type', 'text/xml');
 					res.send(manifest.object2xml(data));
@@ -242,14 +244,14 @@ exports.init = function() {
 	});
 
 	app.post('/api/approve', function(req, res){
-		if (undefined == req.session.user) {
+		if (undefined === req.session.user) {
 			log.error('Unauthorized POST access to /api/approve');
 			res.json({success: false});
 		}
 		id = req.body.id;
 		log.warn('Force approving ' + id);
 		workqueue.get(id, function(err, request){
-			if (request == undefined) {
+			if (request === undefined) {
 				log.error("Can not find change %d", id);
 				return;
 			}
@@ -271,7 +273,7 @@ exports.init = function() {
 	});
 
 	app.post('/api/project', function(req, res) {
-		if (undefined == req.session.user) {
+		if (undefined === req.session.user) {
 			log.error('Unauthorized POST access to /api/project');
 			res.json({success: false});
 		}
@@ -292,4 +294,4 @@ exports.init = function() {
 	log.info("Starting on port " + app.address().port);
 
 	return app;
-}
+};

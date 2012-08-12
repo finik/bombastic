@@ -1,6 +1,6 @@
 var exec = require('child_process').exec;
 var temp = require('temp');
-var fs = fs   = require('fs');
+var fs = require('fs');
 var log = require('./logger');
 
 exports.head = function (path, callback) {
@@ -10,7 +10,7 @@ exports.head = function (path, callback) {
 			commit: str[0],
 			author: str[1],
 			date: str[2],
-			message: str[3],
+			message: str[3]
 		};
 		callback(commit);
 	});
@@ -43,4 +43,4 @@ exports.commit = function (path, author, message, callback) {
 		});
 
 	});
-}
+};

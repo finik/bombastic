@@ -12,7 +12,7 @@ commit = function(project, id, request, callback) {
 			return;
 		}
 
-		if (true == manifest.applyChanges(data, request)) {
+		if (true === manifest.applyChanges(data, request)) {
 			manifest.writeObject(project.manifestPath, project.manifestFile, data, function() {
 				git.commit(project.manifestPath, request.author, request.message, function() {
 					callback();
@@ -20,11 +20,11 @@ commit = function(project, id, request, callback) {
 			});
 		}
 	});
-}
+};
 
 update = function(project, id, request, build, workqueue) {
 	var hasChanged = false;
-	if (undefined == request.job) {
+	if (undefined === request.job) {
 		log.info('Build started for: ' + id + ' > ' + build.url);
 		// First time we see that job on jenkins, lets gather some data
 		var job = {};
@@ -63,16 +63,14 @@ update = function(project, id, request, build, workqueue) {
 	} else {
 		workqueue.updateRecord(id, request);
 	}
-}
+};
 
 
 updaterTask = function(project, timeout) {
 	workqueue.getPendingQueue(project.name, function(err, pending) {
 		if (err) {
 			log.error('Error getting pending list');
-		} else if (pending.length < 0) {
-			// do nothing
-		} else {
+		} else if (pending.length > 0) {
 			jenkins.job(project.job, function(err, data) {
 				if (err) {
 					log.error('Error getting build list');
@@ -81,9 +79,10 @@ updaterTask = function(project, timeout) {
 					for (n in data.builds) {
 						var build = data.builds[n];
 						var params = build.actions[0].parameters;
+						var id;
 						for (pair in params) {
 							if (params[pair].name === 'BOMBASTIC_ID') {
-								var id = params[pair].value;
+								id = params[pair].value;
 							}
 						}
 
@@ -103,7 +102,7 @@ updaterTask = function(project, timeout) {
 	setTimeout(function() {
 		updaterTask(project, timeout);
 	}, timeout*1000);
-}
+};
 
 exports.init = function(project) {
 	var timeout = project.timeout || 10;

@@ -12,7 +12,7 @@ exports.authenticate = function(login, password, callback) {
 		}
 		callback(err, user);
 	});
-}
+};
 
 
 
