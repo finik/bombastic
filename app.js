@@ -53,9 +53,18 @@ exports.init = function() {
 
 	app.get('/', function(req, res) {
 		if (undefined === req.session.user) {
-			log.info('Need to log in, redirect to /login');
-			res.redirect('/login');
-			return;
+			if (undefined === config.ldap) {
+				req.session.user = {
+					fullName : "Anonymous Coward",
+					mail : "dummy@example.com",
+					admin: true
+				};
+				req.session.project = config.projects[Object.keys(config.projects)[0]];
+			} else {
+				log.info('Need to log in, redirect to /login');
+				res.redirect('/login');
+				return;
+			}
 		}
 
 		workqueue.getQueue(req.session.project.name, function(pending, processed) {
@@ -88,9 +97,18 @@ exports.init = function() {
 
 	app.get('/submit', function(req, res){
 		if (undefined === req.session.user) {
-			log.info('Need to log in, redirect to /logn');
-			res.redirect('/login');
-			return;
+			if (undefined === config.ldap) {
+				req.session.user = {
+					fullName : "Anonymous Coward",
+					mail : "dummy@example.com",
+					admin: true
+				};
+				req.session.project = config.projects[Object.keys(config.projects)[0]];
+			} else {
+				log.info('Need to log in, redirect to /login');
+				res.redirect('/login');
+				return;
+			}
 		}
 
 		git.head(req.session.project.manifestPath, function(commit) {
@@ -122,10 +140,7 @@ exports.init = function() {
 				res.json({success: false});
 			} else {
 				req.session.user = user;
-				for (project in config.projects) {
-					req.session.project = config.projects[project];
-					break;
-				}
+				req.session.project = config.projects[Object.keys(config.projects)[0]];
 
 				res.json({success: true});
 			}
