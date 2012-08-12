@@ -8,13 +8,17 @@ requirejs.config({
   paths: {
     'jquery'        : 'libs/jquery.min',
     'bootstrap'     : 'libs/bootstrap/bootstrap',
+    'underscore'    : 'libs/underscore-min',
+    'backbone'      : 'libs/backbone-min'
   }
 });
 
 require([
+  "underscore",
 	"jquery",
-	"bootstrap"
-  ], function($) {
+	"bootstrap",
+  "backbone"
+  ], function(_, $) {
     $(function() {
       $('a.remove').click(function() {
         $this = $(this);

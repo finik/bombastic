@@ -11,9 +11,11 @@ requirejs.config({
     'paging': {
       deps: ['datatables'],
       exports: 'paging'
-    },
+    }
   },
   paths: {
+    'underscore'    : 'libs/underscore-min',
+    'backbone'      : 'libs/backbone-min',
     'jquery'        : 'libs/jquery.min',
     'bootstrap'     : 'libs/bootstrap/bootstrap',
     'datatables'    : 'libs/jquery.dataTables.min',
@@ -22,11 +24,13 @@ requirejs.config({
 });
 
 require([
+  "underscore",
 	"jquery",
 	"bootstrap",
   "datatables",
-  "paging"
-  ], function($) {
+  "paging",
+  "backbone"
+  ], function(_, $) {
     $(function() {
 
       var $project_tr;
