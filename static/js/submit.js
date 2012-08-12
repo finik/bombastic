@@ -1,194 +1,193 @@
 requirejs.config({
-  shim: {
-    'bootstrap': {
-      deps: ['jquery'],
-      exports: 'bootstrap'
-    },
-    'datatables': {
-      deps: ['jquery'],
-      exports: 'datatables'
-    },
-    'paging': {
-      deps: ['datatables'],
-      exports: 'paging'
-    }
-  },
-  paths: {
-    'underscore'    : 'libs/underscore-min',
-    'backbone'      : 'libs/backbone-min',
-    'jquery'        : 'libs/jquery.min',
-    'bootstrap'     : 'libs/bootstrap/bootstrap',
-    'datatables'    : 'libs/jquery.dataTables.min',
-    'paging'        : 'libs/jquery.dataTables.paging'
-  }
+	shim: {
+		'bootstrap': {
+			deps: ['jquery'],
+			exports: 'bootstrap'
+		},
+		'datatables': {
+			deps: ['jquery'],
+			exports: 'datatables'
+		},
+		'paging': {
+			deps: ['datatables'],
+			exports: 'paging'
+		}
+	},
+	paths: {
+		'underscore'    : 'libs/underscore-min',
+		'backbone'      : 'libs/backbone-min',
+		'jquery'        : 'libs/jquery.min',
+		'bootstrap'     : 'libs/bootstrap/bootstrap',
+		'datatables'    : 'libs/jquery.dataTables.min',
+		'paging'        : 'libs/jquery.dataTables.paging'
+	}
 });
 
-require([
-  "underscore",
-	"jquery",
-	"bootstrap",
-  "datatables",
-  "paging",
-  "backbone"
-  ], function(_, $) {
-    $(function() {
+define(function(require) {
+	var _ = require('underscore');
+	var $ = require('jquery');
+	require('bootstrap');
+	require('backbone');
+	require('datatables');
+	require('paging');
 
-      var $project_tr;
-      var $original_tr;
+	$(function() {
 
-      $('select#project').change(function() {
-        $this = $(this);
-        project = $this.val();
-        $.post('/api/project', {project: project}, function(data) {
-          if (data.success) {
-            document.location.href = document.location.href;
-          } else {
-            alert('Something went wrong, server returned error');
-          }
-        });
-      });
+		var $project_tr;
+		var $original_tr;
 
-      $('a.logout').click(function() {
-        $this = $(this);
-        $.post('/api/logout', {}, function(data) {
-          document.location.href = '/';
-        });
-      });
+		$('select#project').change(function() {
+			$this = $(this);
+			project = $this.val();
+			$.post('/api/project', {project: project}, function(data) {
+				if (data.success) {
+					document.location.href = document.location.href;
+				} else {
+					alert('Something went wrong, server returned error');
+				}
+			});
+		});
 
-      $('td>div>a.remove').click(function() {
-        $original_tr = $(this).parent().parent().parent();
-        $project_tr = $original_tr.clone();
-        $project_tr.find('td.action>div').html('Remove');
-        $project_tr.find('td.restore>div').show();
-        $project_tr.appendTo('.pending');
-        $original_tr.addClass('removed-project');
-        $original_tr.find('td.action>div').hide();
-        $original_tr.find('td.restore>div').show();
-      });
+		$('a.logout').click(function() {
+			$this = $(this);
+			$.post('/api/logout', {}, function(data) {
+				document.location.href = '/';
+			});
+		});
 
-      $('td>div>a.modify').click(function() {
-        $original_tr = $(this).parent().parent().parent();
-        $project_tr = $original_tr.clone();
-        $('#modify-name').val($project_tr.children('td.name').text());
-        $('#modify-path').val($project_tr.children('td.path').text());
-        if ($project_tr.children('td.path').text() == 'N/A') {
-          $('#modify-path').attr('readonly', true);
-        }
-        else {
-          $('#modify-path').removeAttr('readonly');
-        }
-        $('#modify-groups').val($project_tr.children('td.groups').text());
-        $('#modify-revision').val($project_tr.children('td.revision').text());
-        $('#editModal').modal('show');
-      });
+		$('td>div>a.remove').click(function() {
+			$original_tr = $(this).parent().parent().parent();
+			$project_tr = $original_tr.clone();
+			$project_tr.find('td.action>div').html('Remove');
+			$project_tr.find('td.restore>div').show();
+			$project_tr.appendTo('.pending');
+			$original_tr.addClass('removed-project');
+			$original_tr.find('td.action>div').hide();
+			$original_tr.find('td.restore>div').show();
+		});
 
-      $('tbody').on('click', 'tr>td>div>a.restore', (function() {
-        $tr = $(this).parent().parent().parent();
-        name = $tr.children('td.name').text();
-        $('tbody.pending>tr').each(function(index, element){
-          if ($(this).children('td.name').text() == name) {
-            $(this).remove();
-          }
-        });
-        $('tbody.original>tr').each(function(index, element){
-          if ($(this).children('td.name').text() == name) {
-            $(this).removeClass('removed-project');
-            $(this).removeClass('modified-project');
-            $(this).find('td.action>div').show();
-            $(this).find('td.restore>div').hide();
-          }
-        });
-      }));
+		$('td>div>a.modify').click(function() {
+			$original_tr = $(this).parent().parent().parent();
+			$project_tr = $original_tr.clone();
+			$('#modify-name').val($project_tr.children('td.name').text());
+			$('#modify-path').val($project_tr.children('td.path').text());
+			if ($project_tr.children('td.path').text() == 'N/A') {
+				$('#modify-path').attr('readonly', true);
+			}
+			else {
+				$('#modify-path').removeAttr('readonly');
+			}
+			$('#modify-groups').val($project_tr.children('td.groups').text());
+			$('#modify-revision').val($project_tr.children('td.revision').text());
+			$('#editModal').modal('show');
+		});
 
-      $('#modify-ok').click(function() {
-        $project_tr.find('td.action>div').html('Modify');
-        $project_tr.find('td.restore>div').show();
-        $project_tr.children('td.path').text($('#modify-path').val());
-        $project_tr.children('td.groups').text($('#modify-groups').val());
-        $project_tr.children('td.remote').text($('#modify-remote').val());
-        $project_tr.children('td.revision').text($('#modify-revision').val());
-        $('#editModal').modal('hide');
-        $project_tr.appendTo('.pending');
-        $original_tr.addClass('modified-project');
-        $original_tr.find('td.action>div').hide();
-        $original_tr.find('td.restore>div').show();
-        event.stopPropagation();
-      });
+		$('tbody').on('click', 'tr>td>div>a.restore', (function() {
+			$tr = $(this).parent().parent().parent();
+			var name = $tr.children('td.name').text();
+			$('tbody.pending>tr').each(function(index, element){
+				if ($(this).children('td.name').text() == name) {
+					$(this).remove();
+				}
+			});
+			$('tbody.original>tr').each(function(index, element){
+				if ($(this).children('td.name').text() == name) {
+					$(this).removeClass('removed-project');
+					$(this).removeClass('modified-project');
+					$(this).find('td.action>div').show();
+					$(this).find('td.restore>div').hide();
+				}
+			});
+		}));
 
-      $('#add-component').click(function() {
-        $('#addModal').modal('show');
-      })
+		$('#modify-ok').click(function() {
+			$project_tr.find('td.action>div').html('Modify');
+			$project_tr.find('td.restore>div').show();
+			$project_tr.children('td.path').text($('#modify-path').val());
+			$project_tr.children('td.groups').text($('#modify-groups').val());
+			$project_tr.children('td.remote').text($('#modify-remote').val());
+			$project_tr.children('td.revision').text($('#modify-revision').val());
+			$('#editModal').modal('hide');
+			$project_tr.appendTo('.pending');
+			$original_tr.addClass('modified-project');
+			$original_tr.find('td.action>div').hide();
+			$original_tr.find('td.restore>div').show();
+			event.stopPropagation();
+		});
 
-      $('#add-ok').click(function() {
-        $project_tr = $('#tr-template').clone();
-        $project_tr.removeClass('hide');
-        $project_tr.children('td.name').text($('#add-name').val());
-        $project_tr.children('td.path').text($('#add-path').val());
-        $project_tr.children('td.groups').text($('#add-groups').val());
-        $project_tr.children('td.remote').text($('#add-remote').val());
-        $project_tr.children('td.revision').text($('#add-revision').val());
-        $('#addModal').modal('hide');
-        $project_tr.appendTo('.pending');
-        event.stopPropagation();
-      });
+		$('#add-component').click(function() {
+			$('#addModal').modal('show');
+		});
 
-      $('#submit-bom').click(function() {
-        changes = [];
-        request = {};
+		$('#add-ok').click(function() {
+			$project_tr = $('#tr-template').clone();
+			$project_tr.removeClass('hide');
+			$project_tr.children('td.name').text($('#add-name').val());
+			$project_tr.children('td.path').text($('#add-path').val());
+			$project_tr.children('td.groups').text($('#add-groups').val());
+			$project_tr.children('td.remote').text($('#add-remote').val());
+			$project_tr.children('td.revision').text($('#add-revision').val());
+			$('#addModal').modal('hide');
+			$project_tr.appendTo('.pending');
+			event.stopPropagation();
+		});
 
-        $('tbody.pending>tr').each(function(index, element){
-          if ($(this).hasClass('hide')) return;
+		$('#submit-bom').click(function() {
+			changes = [];
+			request = {};
 
-          component = {};
-          component.action = $(this).find('td.action>div').text();
-          component.name = $(this).children('td.name').text();
-          changes.push(component);
+			$('tbody.pending>tr').each(function(index, element){
+				if ($(this).hasClass('hide')) return;
 
-          if ($(this).children('td.path').text()) {
-            component.path = $(this).children('td.path').text();
-          }
+				component = {};
+				component.action = $(this).find('td.action>div').text();
+				component.name = $(this).children('td.name').text();
+				changes.push(component);
 
-          if ($(this).children('td.groups').text()) {
-            component.groups = $(this).children('td.groups').text();
-          }
+				if ($(this).children('td.path').text()) {
+					component.path = $(this).children('td.path').text();
+				}
 
-          if ($(this).children('td.remote').text()) {
-            component.remote = $(this).children('td.remote').text();
-          }
+				if ($(this).children('td.groups').text()) {
+					component.groups = $(this).children('td.groups').text();
+				}
 
-          if ($(this).children('td.revision').text()) {
-            component.revision = $(this).children('td.revision').text();
-          }
-        });
+				if ($(this).children('td.remote').text()) {
+					component.remote = $(this).children('td.remote').text();
+				}
 
-        if (changes.length == 0) {
-          alert('There are no pending changes to submit!');
-          return;
-        }
+				if ($(this).children('td.revision').text()) {
+					component.revision = $(this).children('td.revision').text();
+				}
+			});
 
-        request.changes = changes;
-        request.message = $('#message').val();
+			if (changes.length === 0) {
+				alert('There are no pending changes to submit!');
+				return;
+			}
 
-        if (request.message == "") {
-          alert('Please describe your changes!');
-          return;
-        }
+			request.changes = changes;
+			request.message = $('#message').val();
 
-
-        $.post('/api/submit', {request: request}, function(data) {
-          document.location.href = '/';
-        });
+			if (request.message === "") {
+				alert('Please describe your changes!');
+				return;
+			}
 
 
-      });
+			$.post('/api/submit', {request: request}, function(data) {
+				document.location.href = '/';
+			});
 
-      $('#datatable').dataTable({
-        "sDom": "<'row'<'span12'f>r><'row'<'span6'i><'span6'p>>t<'row'<'span6'i><'span6'p>>",
-        "sPaginationType": "bootstrap"
-      });
 
-    });
-  });
+		});
+
+		$('#datatable').dataTable({
+			"sDom": "<'row'<'span12'f>r><'row'<'span6'i><'span6'p>>t<'row'<'span6'i><'span6'p>>",
+			"sPaginationType": "bootstrap"
+		});
+	});
+});
 
 
 
