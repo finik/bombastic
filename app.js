@@ -210,6 +210,20 @@ exports.init = function() {
 		});
 	});
 
+	app.get('/api/projects', function(req, res){
+		var project = req.session.project;
+		console.log(project);
+		manifest.readObject(project.manifestPath, project.manifestFile, function(err, data){
+			if(err) {
+				log.error("Could not open file: " + err);
+				res.json({success: false});
+				return;
+			}
+
+			res.json(data.manifest.project);
+		});
+	});
+
 	app.get('/api/get/:id', function(req, res){
 		// This doesn't have a session associated with it,
 		// it can't rely on any session variables, only on
