@@ -24,14 +24,14 @@ object2xml = function(manifestObject) {
 
 		// Cleanup main project array
 		for (i = length; i > 0; i--) {
-			if (manifestObject.manifest.project[i] == undefined) {
+			if (manifestObject.manifest.project[i] === undefined) {
 				manifestObject.manifest.project.splice(i, 1);
 			}
 		}
 	}
 
 	return pd.xml(parser.toXml(manifestObject));
-}
+};
 exports.object2xml = object2xml;
 
 xml2object = function(xml) {
@@ -41,12 +41,12 @@ xml2object = function(xml) {
 
 	var length = manifestObject.manifest.project.length;
 	for (i = 0; i < length; i++) {
-		project = manifestObject.manifest.project[i];
+		var project = manifestObject.manifest.project[i];
 		delete project.groups;
 	}
 
 	return manifestObject;
-}
+};
 exports.xml2object = xml2object;
 
 
@@ -71,14 +71,14 @@ exports.readObject = function(path, file, callback) {
 
 		callback(err, manifestObject);
 	});
-}
+};
 
 exports.writeObject = function(path, file, data, callback) {
 
 	fs.writeFile(path + file, object2xml(data), function(err){
 		callback(err);
 	});
-}
+};
 
 exports.applyChanges = function (manifest, request) {
 	var projects = manifest.manifest.project;
@@ -126,4 +126,4 @@ exports.applyChanges = function (manifest, request) {
 
 	return true;
 
-}
+};
