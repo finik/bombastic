@@ -212,7 +212,6 @@ exports.init = function() {
 
 	app.get('/api/projects', function(req, res){
 		var project = req.session.project;
-		console.log(project);
 		manifest.readObject(project.manifestPath, project.manifestFile, function(err, data){
 			if(err) {
 				log.error("Could not open file: " + err);
@@ -222,6 +221,32 @@ exports.init = function() {
 
 			res.json(data.manifest.project);
 		});
+	});
+
+	app.get('/api/changes', function(req, res) {
+		if (undefined !== req.session.changes) {
+			var keys = Object.keys(req.session.changes);
+			var values = keys.map(function(v) { return req.session.changes[v]; });
+			res.json(values);
+		} else {
+			res.json([]);
+		}
+	});
+
+	app.del('/api/changes/:id', function(req, res){
+		if (undefined !== req.session.changes[req.params.id]) {
+			delete req.session.changes[req.params.id];
+			res.json({success: true});
+		}
+	});
+
+	app.post('/api/changes', function(req, res) {
+		req.body.id = require('crypto').createHash('md5').update(req.body.project.name).digest("hex");
+		if (undefined === req.session.changes) {
+			req.session.changes = {};
+		}
+		req.session.changes[req.body.id] = req.body;
+		res.json(req.body);
 	});
 
 	app.get('/api/get/:id', function(req, res){

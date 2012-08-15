@@ -56,24 +56,22 @@ define(function(require) {
 				collection: manifest,
 				el: $('tbody.original'),
 				remove: function(project) {
-					var change = new Change({
+					changes.create({
 						action: 'REMOVE',
 						project: project.toJSON()
 					});
 					project.set('removed', true);
-					changes.add(change);
 				},
 				modify: function(project) {
 					var modifyProjectView = new ModifyProjectView({
 						project: project.toJSON(),
 						success: function(newProject) {
-							var change = new Change({
+							changes.create({
 								action: 'MODIFY',
 								project: newProject,
 								original: project.toJSON()
 							});
 							project.set('modified', true);
-							changes.add(change);
 						}
 					});
 					modifyProjectView.render().show();
@@ -83,7 +81,7 @@ define(function(require) {
 						if (project.get('name') == change.get('project').name) {
 							project.unset('removed');
 							project.unset('modified');
-							changes.remove(change);
+							change.destroy();
 						}
 					});
 				}
@@ -92,7 +90,7 @@ define(function(require) {
 				collection: changes,
 				el: $('tbody.pending'),
 				restore: function(change) {
-					if ('add' != change.get('action')) {
+					if ('ADD' != change.get('action')) {
 						manifest.each(function(project){
 							if (change.get('project').name == project.get('name')) {
 								project.unset('removed');
@@ -100,7 +98,7 @@ define(function(require) {
 							}
 						});
 					}
-					changes.remove(change);
+					change.destroy();
 				}
 			});
 
@@ -108,6 +106,18 @@ define(function(require) {
 				"sDom": "<'row'<'span12'f>r><'row'<'span6'i><'span6'p>>t<'row'<'span6'i><'span6'p>>",
 				"sPaginationType": "bootstrap"
 			});
+
+			changes.fetch({success: function(changes, response){
+				changes.each(function(change) {
+					if (change.get('action') != 'ADD') {
+						manifest.each(function(project){
+							if (change.get('project').name == project.get('name')) {
+								project.set(change.get('action') == 'REMOVE'?'removed':'modified', true);
+							}
+						});
+					}
+				});
+			}});
 		}});
 
 		var $project_tr;
@@ -135,11 +145,10 @@ define(function(require) {
 		$('#add-component').click(function() {
 			var addProjectView = new AddProjectView({success: function(project){
 				console.log(project);
-				var change = new Change({
+				changes.create({
 					action: 'ADD',
 					project: project
 				});
-				changes.add(change);
 			}});
 			addProjectView.render().show();
 		});
