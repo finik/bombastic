@@ -69,14 +69,14 @@
           </tr>
         </thead>
         <tbody>
-            <% request.changes.forEach(function(project){ %>
+            <% request.changes.forEach(function(change){ %>
               <tr class="project">
-              <td class="action"><%= project.action %></td>
-              <td class="name"><%= project.name %></td>
-              <td class="path"><%= (project.path)?project.path:"" %></td>
-              <td class="groups"><%= (project.groups)?project.groups:"" %></td>
-              <td class="remote"><%= (project.remote)?project.remote:"" %></td>
-              <td class="revision"><%= (project.revision)?project.revision:"" %></td>
+              <td class="action"><%= change.action %></td>
+              <td class="name"><%= change.project.name %></td>
+              <td class="path"><%= (change.project.path)?change.project.path:"" %></td>
+              <td class="groups"><%= (change.project.groups)?change.project.groups:"" %></td>
+              <td class="remote"><%= (change.project.remote)?change.project.remote:"" %></td>
+              <td class="revision"><%= (change.project.revision)?change.project.revision:"" %></td>
               </tr>
             <% }) %>
         </tbody>
@@ -121,12 +121,12 @@
         <tbody>
             <% request.changes.forEach(function(project){ %>
               <tr class="project">
-              <td class="action"><%= project.action %></td>
-              <td class="name"><%= project.name %></td>
-              <td class="path"><%= (project.path)?project.path:"" %></td>
-              <td class="groups"><%= (project.groups)?project.groups:"" %></td>
-              <td class="remote"><%= (project.remote)?project.remote:"" %></td>
-              <td class="revision"><%= (project.revision)?project.revision:"" %></td>
+              <td class="action"><%= change.action %></td>
+              <td class="name"><%= change.project.name %></td>
+              <td class="path"><%= (change.project.path)?change.project.path:"" %></td>
+              <td class="groups"><%= (change.project.groups)?change.project.groups:"" %></td>
+              <td class="remote"><%= (change.project.remote)?change.project.remote:"" %></td>
+              <td class="revision"><%= (change.project.revision)?change.project.revision:"" %></td>
               </tr>
             <% }) %>
         </tbody>

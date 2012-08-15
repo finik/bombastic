@@ -87,7 +87,7 @@ exports.applyChanges = function (manifest, request) {
 	for (i in request.changes) {
 		change = request.changes[i];
 		switch (change.action) {
-			case "Add":
+			case "ADD":
 				// TODO: error checking, does it already exist?
 				project = {};
 				project.name = change.name;
@@ -98,13 +98,13 @@ exports.applyChanges = function (manifest, request) {
 				projects.push(project);
 			break;
 
-			case "Remove":
+			case "REMOVE":
 				// TODO: Error checking, is it really removing anything?
 				projects = projects.filter(function(v) { return v.name == change.name ? false : true;});
 				manifest.manifest.project = projects;
 			break;
 
-			case "Modify":
+			case "MODIFY":
 				for (j in projects) {
 					project = projects[j];
 					if (change.name == project.name) {

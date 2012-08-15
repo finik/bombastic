@@ -54,10 +54,6 @@
           </tr>
         </thead>
         <tbody class="pending">
-          <tr class="project hide" id="tr-template">
-          <td class="restore"><div><a href="#" class="restore" title="Restore"><i class="icon-remove"></i></a></div></td><td class="action"><div>Add</div></td>
-          <td class="name">/td><td class="path"></td><td class="groups"></td><td class="remote"></td><td class="revision"></td>
-          </tr>
         </tbody>
       </table>
       <hr>
@@ -101,81 +97,20 @@
   <div class="row">
     <div class="span12">
       <table class="table" id="datatable">
-        <thead>
-          <tr>
-            <td><strong></strong></td>
-            <td><strong>Action</strong></td>
-            <td><strong>Name</strong></td>
-            <td><strong>Path</strong></td>
-            <td><strong>Groups</strong></td>
-            <td><strong>Remote</strong></td>
-            <td><strong>Revision</strong></td>
-          </tr>
-        </thead>
-        <tbody class="original">
-          <% manifest.manifest.project.forEach(function(project){ %>
-            <tr class="project">
-            <td class="restore"><div style="display:none"><a href="#" class="restore" title="Restore"><i class="icon-remove"></i></a></div></td>
-            <td class="action"><div><a href="#" class="modify" title="Modify"><i class="icon-pencil"></i></a> <a href="#" class="remove" title="Remove"><i class="icon-trash"></i></a></div></td>
-            <td class="name"><%= project.name %></td>
-            <td class="path"><%= (project.path)?project.path:"" %></td>
-            <td class="groups"><%= (project.groups)?project.groups:"" %></td>
-            <td class="remote"><%= (project.remote)?project.remote:"" %></td>
-            <td class="revision"><%= (project.revision)?project.revision:"" %></td>
-            </tr>
-          <% }) %>
-        </tbody>
+      <thead>
+        <tr>
+          <td><strong></strong></td>
+          <td><strong>Action</strong></td>
+          <td><strong>Name</strong></td>
+          <td><strong>Path</strong></td>
+          <td><strong>Groups</strong></td>
+          <td><strong>Remote</strong></td>
+          <td><strong>Revision</strong></td>
+        </tr>
+      </thead>
+      <tbody class="original">
+      </tbody>         
       </table>
-    </div>
-  </div>
-
-  <div class="modal hide fade" id="editModal">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal">×</button>
-      <h3>Modify component</h3>
-    </div>
-    <div class="modal-body">
-      <form>
-        <label>Name</label>
-        <input type="text" class="span5" id="modify-name" readonly="readonly">
-        <label>Path</label>
-        <input type="text" class="span5" id="modify-path">
-        <label>Groups</label>
-        <input type="text" class="span5" id="modify-groups">
-        <label>Remote</label>
-        <input type="text" class="span5" id="modify-remote">
-        <label>Revision</label>
-        <input type="text" class="span5" id="modify-revision">
-      </form>
-    </div>
-    <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-      <a href="#" class="btn btn-primary" id="modify-ok">OK</a>
-    </div>
-  </div>
-
-  <div class="modal hide fade" id="addModal">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal">×</button>
-      <h3>Add new component</h3>
-    </div>
-    <div class="modal-body">
-      <form>
-        <label>Name</label>
-        <input type="text" class="span5" id="add-name">
-        <label>Path</label>
-        <input type="text" class="span5" id="add-path">
-        <label>Groups</label>
-        <input type="text" class="span5" id="add-groups">
-        <label>Remote</label>
-        <input type="text" class="span5" id="add-remote">
-        <label>Revision</label>
-        <input type="text" class="span5" id="add-revision">
-      </form>
-    </div>
-    <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-      <a href="#" class="btn btn-primary" id="add-ok">OK</a>
     </div>
   </div>
 

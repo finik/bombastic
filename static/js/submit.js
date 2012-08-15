@@ -11,6 +11,14 @@ requirejs.config({
 		'paging': {
 			deps: ['datatables'],
 			exports: 'paging'
+		},
+		'underscore': {
+			exports: '_'
+		},
+		'backbone': {
+			exports: 'Backbone',
+			deps: ['underscore']
+
 		}
 	},
 	paths: {
@@ -19,7 +27,8 @@ requirejs.config({
 		'jquery'        : 'libs/jquery.min',
 		'bootstrap'     : 'libs/bootstrap/bootstrap',
 		'datatables'    : 'libs/jquery.dataTables.min',
-		'paging'        : 'libs/jquery.dataTables.paging'
+		'paging'        : 'libs/jquery.dataTables.paging',
+		'text'			: 'libs/text'
 	}
 });
 
@@ -30,8 +39,76 @@ define(function(require) {
 	require('backbone');
 	require('datatables');
 	require('paging');
+	var Manifest = require('collections/manifest');
+	var ManifestView = require('views/manifest');
+	var AddProjectView = require('views/add');
+	var ModifyProjectView = require('views/modify');
+	var Changes = require('collections/changes');
+	var ChangesView = require('views/changes');
 
 	$(function() {
+
+		var manifest = new Manifest();
+		var changes = new Changes();
+
+		manifest.fetch({success: function(manifest, response){
+			var manifestView = new ManifestView({
+				collection: manifest,
+				el: $('tbody.original'),
+				remove: function(project) {
+					var change = new Change({
+						action: 'REMOVE',
+						project: project.toJSON()
+					});
+					project.set('removed', true);
+					changes.add(change);
+				},
+				modify: function(project) {
+					var modifyProjectView = new ModifyProjectView({
+						project: project.toJSON(),
+						success: function(newProject) {
+							var change = new Change({
+								action: 'MODIFY',
+								project: newProject,
+								original: project.toJSON()
+							});
+							project.set('modified', true);
+							changes.add(change);
+						}
+					});
+					modifyProjectView.render().show();
+				},
+				restore: function(project) {
+					changes.each(function(change) {
+						if (project.get('name') == change.get('project').name) {
+							project.unset('removed');
+							project.unset('modified');
+							changes.remove(change);
+						}
+					});
+				}
+			});
+			var changesView = new ChangesView({
+				collection: changes,
+				el: $('tbody.pending'),
+				restore: function(change) {
+					if ('add' != change.get('action')) {
+						manifest.each(function(project){
+							if (change.get('project').name == project.get('name')) {
+								project.unset('removed');
+								project.unset('modified');
+							}
+						});
+					}
+					changes.remove(change);
+				}
+			});
+
+			$('#datatable').dataTable({
+				"sDom": "<'row'<'span12'f>r><'row'<'span6'i><'span6'p>>t<'row'<'span6'i><'span6'p>>",
+				"sPaginationType": "bootstrap"
+			});
+		}});
 
 		var $project_tr;
 		var $original_tr;
@@ -55,119 +132,27 @@ define(function(require) {
 			});
 		});
 
-		$('td>div>a.remove').click(function() {
-			$original_tr = $(this).parent().parent().parent();
-			$project_tr = $original_tr.clone();
-			$project_tr.find('td.action>div').html('Remove');
-			$project_tr.find('td.restore>div').show();
-			$project_tr.appendTo('.pending');
-			$original_tr.addClass('removed-project');
-			$original_tr.find('td.action>div').hide();
-			$original_tr.find('td.restore>div').show();
-		});
-
-		$('td>div>a.modify').click(function() {
-			$original_tr = $(this).parent().parent().parent();
-			$project_tr = $original_tr.clone();
-			$('#modify-name').val($project_tr.children('td.name').text());
-			$('#modify-path').val($project_tr.children('td.path').text());
-			if ($project_tr.children('td.path').text() == 'N/A') {
-				$('#modify-path').attr('readonly', true);
-			}
-			else {
-				$('#modify-path').removeAttr('readonly');
-			}
-			$('#modify-groups').val($project_tr.children('td.groups').text());
-			$('#modify-revision').val($project_tr.children('td.revision').text());
-			$('#editModal').modal('show');
-		});
-
-		$('tbody').on('click', 'tr>td>div>a.restore', (function() {
-			$tr = $(this).parent().parent().parent();
-			var name = $tr.children('td.name').text();
-			$('tbody.pending>tr').each(function(index, element){
-				if ($(this).children('td.name').text() == name) {
-					$(this).remove();
-				}
-			});
-			$('tbody.original>tr').each(function(index, element){
-				if ($(this).children('td.name').text() == name) {
-					$(this).removeClass('removed-project');
-					$(this).removeClass('modified-project');
-					$(this).find('td.action>div').show();
-					$(this).find('td.restore>div').hide();
-				}
-			});
-		}));
-
-		$('#modify-ok').click(function() {
-			$project_tr.find('td.action>div').html('Modify');
-			$project_tr.find('td.restore>div').show();
-			$project_tr.children('td.path').text($('#modify-path').val());
-			$project_tr.children('td.groups').text($('#modify-groups').val());
-			$project_tr.children('td.remote').text($('#modify-remote').val());
-			$project_tr.children('td.revision').text($('#modify-revision').val());
-			$('#editModal').modal('hide');
-			$project_tr.appendTo('.pending');
-			$original_tr.addClass('modified-project');
-			$original_tr.find('td.action>div').hide();
-			$original_tr.find('td.restore>div').show();
-			event.stopPropagation();
-		});
-
 		$('#add-component').click(function() {
-			$('#addModal').modal('show');
-		});
-
-		$('#add-ok').click(function() {
-			$project_tr = $('#tr-template').clone();
-			$project_tr.removeClass('hide');
-			$project_tr.children('td.name').text($('#add-name').val());
-			$project_tr.children('td.path').text($('#add-path').val());
-			$project_tr.children('td.groups').text($('#add-groups').val());
-			$project_tr.children('td.remote').text($('#add-remote').val());
-			$project_tr.children('td.revision').text($('#add-revision').val());
-			$('#addModal').modal('hide');
-			$project_tr.appendTo('.pending');
-			event.stopPropagation();
+			var addProjectView = new AddProjectView({success: function(project){
+				console.log(project);
+				var change = new Change({
+					action: 'ADD',
+					project: project
+				});
+				changes.add(change);
+			}});
+			addProjectView.render().show();
 		});
 
 		$('#submit-bom').click(function() {
-			changes = [];
-			request = {};
-
-			$('tbody.pending>tr').each(function(index, element){
-				if ($(this).hasClass('hide')) return;
-
-				component = {};
-				component.action = $(this).find('td.action>div').text();
-				component.name = $(this).children('td.name').text();
-				changes.push(component);
-
-				if ($(this).children('td.path').text()) {
-					component.path = $(this).children('td.path').text();
-				}
-
-				if ($(this).children('td.groups').text()) {
-					component.groups = $(this).children('td.groups').text();
-				}
-
-				if ($(this).children('td.remote').text()) {
-					component.remote = $(this).children('td.remote').text();
-				}
-
-				if ($(this).children('td.revision').text()) {
-					component.revision = $(this).children('td.revision').text();
-				}
-			});
-
-			if (changes.length === 0) {
+			var request = {};
+			request.changes = changes.toJSON();
+			request.message = $('#message').val();
+			
+			if (request.changes.length === 0) {
 				alert('There are no pending changes to submit!');
 				return;
 			}
-
-			request.changes = changes;
-			request.message = $('#message').val();
 
 			if (request.message === "") {
 				alert('Please describe your changes!');
@@ -182,10 +167,7 @@ define(function(require) {
 
 		});
 
-		$('#datatable').dataTable({
-			"sDom": "<'row'<'span12'f>r><'row'<'span6'i><'span6'p>>t<'row'<'span6'i><'span6'p>>",
-			"sPaginationType": "bootstrap"
-		});
+
 	});
 });
 

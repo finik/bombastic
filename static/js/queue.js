@@ -17,9 +17,12 @@ require([
   "underscore",
 	"jquery",
 	"bootstrap",
-  "backbone"
-  ], function(_, $) {
+  "backbone",
+  ], function(_, $, bootstrap, Backbone) {
+          console.log(Backbone);
+
     $(function() {
+
       $('a.remove').click(function() {
         $this = $(this);
         id = $this.parent().children('span.id').text();
