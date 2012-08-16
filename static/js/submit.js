@@ -45,11 +45,13 @@ define(function(require) {
 	var ModifyProjectView = require('views/modify');
 	var Changes = require('collections/changes');
 	var ChangesView = require('views/changes');
+	var Queue = require('collections/queue');
 
 	$(function() {
 
 		var manifest = new Manifest();
 		var changes = new Changes();
+		var queue = new Queue();
 
 		manifest.fetch({success: function(manifest, response){
 			var manifestView = new ManifestView({
@@ -154,26 +156,31 @@ define(function(require) {
 		});
 
 		$('#submit-bom').click(function() {
-			var request = {};
-			request.changes = changes.toJSON();
-			request.message = $('#message').val();
-			
-			if (request.changes.length === 0) {
+			var message = $('#message').val();
+
+			if (changes.length === 0) {
 				alert('There are no pending changes to submit!');
 				return;
 			}
 
-			if (request.message === "") {
+			if (message === "") {
 				alert('Please describe your changes!');
 				return;
 			}
 
-
-			$.post('/api/submit', {request: request}, function(data) {
-				document.location.href = '/';
+			queue.create({
+				changes: changes.toJSON(),
+				message: message
+			},
+			{
+				wait: true
 			});
 
+			changes.each(function(change) {
+				change.destroy();
+			});
 
+			document.location.href = '/';
 		});
 
 

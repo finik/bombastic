@@ -153,13 +153,13 @@ exports.init = function() {
 		res.json({success: true});
 	});
 
-	app.post('/api/submit', function(req, res){
+	app.post('/api/requests', function(req, res){
 		if (undefined === req.session.user) {
 			log.error('Illegal submit request, no active user!');
 			res.json({success: false});
 		}
 
-		request = req.body.request;
+		request = req.body;
 		request.pending = true;
 		request.status = 'waiting';
 		request.author = {};
