@@ -67,7 +67,7 @@ update = function(project, id, request, build, workqueue) {
 
 
 updaterTask = function(project, timeout) {
-	workqueue.getPendingQueue(project.name, function(err, pending) {
+	workqueue.getQueue(project.name, true, 100, function(err, pending) {
 		if (err) {
 			log.error('Error getting pending list');
 		} else if (pending.length > 0) {

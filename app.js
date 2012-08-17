@@ -68,20 +68,15 @@ exports.init = function() {
 			}
 		}
 
-		workqueue.getQueue(req.session.project.name, function(pending, processed) {
-			res.render('queue', {
-				title: config.title,
-				user: {
-					name: req.session.user.fullName,
-					email: req.session.user.mail,
-					admin: (req.session.project.admins.indexOf(req.session.user.mail) != -1)},
-				projects: config.projects,
-				current: req.session.project.name,
-				pending: pending,
-				processed: processed
-			});
+		res.render('queue', {
+			title: config.title,
+			user: {
+				name: req.session.user.fullName,
+				email: req.session.user.mail,
+				admin: (req.session.project.admins.indexOf(req.session.user.mail) != -1)},
+			projects: config.projects,
+			current: req.session.project.name
 		});
-
 	});
 
 	app.get('/login', function(req, res) {
@@ -112,27 +107,21 @@ exports.init = function() {
 			}
 		}
 
-		git.head(req.session.project.manifestPath, function(commit) {
-			manifest.readObject(req.session.project.manifestPath, req.session.project.manifestFile, function(err, data){
-				if(err) {
-					log.error("Could not read manifest: " + err);
-				}
-
-				res.render('submit', {
-							title: config.title,
-							user: {
-								name: req.session.user.fullName,
-								email: req.session.user.mail,
-								admin: (req.session.project.admins.indexOf(req.session.user.mail) != -1)},
-							commit: commit,
-							projects: config.projects,
-							current: req.session.project.name,
-							manifest: data
-				});
-			});
+		res.render('submit', {
+			title: config.title,
+			user: {
+				name: req.session.user.fullName,
+				email: req.session.user.mail,
+				admin: (req.session.project.admins.indexOf(req.session.user.mail) != -1)},
+			commit: commit,
+			projects: config.projects,
+			current: req.session.project.name,
 		});
 	});
 
+	///////////////////////////////////////////////////////
+	// Session APIs
+	///////////////////////////////////////////////////////
 	app.post('/api/login', function(req, res){
 		var login = req.body.login;
 		var password = req.body.password;
@@ -153,6 +142,30 @@ exports.init = function() {
 		res.json({success: true});
 	});
 
+	///////////////////////////////////////////////////////
+	// /api/requests/*
+	///////////////////////////////////////////////////////
+
+	// Get
+	app.get('/api/requests', function(req, res){
+		var pending = true;
+		var limit = 0;
+		if (req.query.pending) {
+			pending = (req.query.pending === 'true');
+		}
+		if (req.query.limit) {
+			limit = parseInt(req.query.limit);
+		}
+		workqueue.getQueue(req.session.project.name, pending, limit, function(err, queue) {
+			if (err) {
+				res.json({success: false});
+			} else {
+				res.json(queue);
+			}
+		});
+	});
+
+	// Create
 	app.post('/api/requests', function(req, res){
 		if (undefined === req.session.user) {
 			log.error('Illegal submit request, no active user!');
@@ -173,6 +186,49 @@ exports.init = function() {
 		});
 	});
 
+	// Delete
+	app.post('/api/requests/:id', function(req, res){
+		if (undefined === req.session.user) {
+			log.error('Unauthorized DELETE access to /api/requests/:id');
+			res.json({success: false});
+		}
+		log.warn('Deleting ' + req.params.id);
+		workqueue.delete(req.body.id, function(err) {
+			res.json({success: true});
+		});
+	});
+
+	// Approve (modify)
+	app.post('/api/approve', function(req, res){
+		if (undefined === req.session.user) {
+			log.error('Unauthorized POST access to /api/approve');
+			res.json({success: false});
+		}
+		id = req.body.id;
+		log.warn('Force approving ' + id);
+		workqueue.get(id, function(err, request){
+			if (request === undefined) {
+				log.error("Can not find change %d", id);
+				return;
+			}
+			else {
+				commit(id, request, function(err) {
+					var job = {};
+					job.name = 'Manual force';
+					job.number = 0;
+					job.url = '';
+					request.job = job;
+					request.pending = false;
+					request.status = 'approved';
+					workqueue.updateRecord(id, request);
+					res.json({success: true});
+				});
+			}
+
+		});
+	});
+
+	// Create (clone)
 	app.post('/api/resubmit', function(req, res){
 		if (undefined === req.session.user) {
 			log.error('Illegal submit request, no active user!');
@@ -198,18 +254,6 @@ exports.init = function() {
 		});
 	});
 
-
-	app.post('/api/delete', function(req, res){
-		if (undefined === req.session.user) {
-			log.error('Unauthorized POST access to /api/delete');
-			res.json({success: false});
-		}
-		log.warn('Deleting ' + req.params.id);
-		workqueue.delete(req.body.id, function(err) {
-			res.json({success: true});
-		});
-	});
-
 	app.get('/api/projects', function(req, res){
 		var project = req.session.project;
 		manifest.readObject(project.manifestPath, project.manifestFile, function(err, data){
@@ -223,6 +267,9 @@ exports.init = function() {
 		});
 	});
 
+	///////////////////////////////////////////////////////
+	// /api/changes/*
+	///////////////////////////////////////////////////////
 	app.get('/api/changes', function(req, res) {
 		if (undefined !== req.session.changes) {
 			var keys = Object.keys(req.session.changes);
@@ -249,6 +296,9 @@ exports.init = function() {
 		res.json(req.body);
 	});
 
+	///////////////////////////////////////////////////////
+	// MISC
+	///////////////////////////////////////////////////////
 	app.get('/api/get/:id', function(req, res){
 		// This doesn't have a session associated with it,
 		// it can't rely on any session variables, only on
@@ -295,35 +345,6 @@ exports.init = function() {
 				res.header('Content-Type', 'text/xml');
 				res.send(manifest.object2xml(data));
 			}
-		});
-	});
-
-	app.post('/api/approve', function(req, res){
-		if (undefined === req.session.user) {
-			log.error('Unauthorized POST access to /api/approve');
-			res.json({success: false});
-		}
-		id = req.body.id;
-		log.warn('Force approving ' + id);
-		workqueue.get(id, function(err, request){
-			if (request === undefined) {
-				log.error("Can not find change %d", id);
-				return;
-			}
-			else {
-				commit(id, request, function(err) {
-					var job = {};
-					job.name = 'Manual force';
-					job.number = 0;
-					job.url = '';
-					request.job = job;
-					request.pending = false;
-					request.status = 'approved';
-					workqueue.updateRecord(id, request);
-					res.json({success: true});
-				});
-			}
-
 		});
 	});
 

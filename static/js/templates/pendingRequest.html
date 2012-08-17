@@ -1,0 +1,39 @@
+<div class="row">
+	<div class="span2">
+		<span class="id hide"><%= _id %></span>
+		<a href="/api/get/<%= _id %>" title="Generate XML" class="generate"><i class="icon-download-alt"></i></a>
+		<strong><a href="mailto:<%= author.email %>"><%= author.name %></a></strong><br>
+		<%= date.toTimeString() %><br>
+		<%= date.toDateString() %><br>
+		<% if (status === 'testing') { %><div class="alert-info">Testing (<a href="<%= job.url %>console" target="_blank">view log</a>)</div><% } %>
+		<% if (status === 'approved') { %><div class="alert-info">Approved (<a href="<%= job.url %>console" target="_blank">view log</a>)</div><% } %>
+		<strong>Description:</strong><br><%= message %><br>
+
+	</div>
+	<div class="span9 well">
+		<table class="table">
+		<thead>
+			<tr>
+				<td><strong>Action</strong></td>
+				<td><strong>Name</strong></td>
+				<td><strong>Path</strong></td>
+				<td><strong>Groups</strong></td>
+				<td><strong>Remote</strong></td>
+				<td><strong>Revision</strong></td>
+			</tr>
+		</thead>
+		<tbody>
+				<% changes.forEach(function(change){ %>
+					<tr class="project">
+					<td class="action"><%= change.action %></td>
+					<td class="name"><%= change.project.name %></td>
+					<td class="path"><%= (change.project.path)?change.project.path:"" %></td>
+					<td class="groups"><%= (change.project.groups)?change.project.groups:"" %></td>
+					<td class="remote"><%= (change.project.remote)?change.project.remote:"" %></td>
+					<td class="revision"><%= (change.project.revision)?change.project.revision:"" %></td>
+					</tr>
+				<% }) %>
+		</tbody>
+		</table>
+	</div>
+</div>

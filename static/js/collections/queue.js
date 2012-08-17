@@ -5,15 +5,14 @@ define(function(require){
 	var Request = require('models/request');
 
 	var Queue = Backbone.Collection.extend({
-		initialize: function() {
+		initialize: function(props) {
+			this.url = props.url;
 			this.on("all", function(event, message) {
 				console.log("Changes:" + event + message);
 			});
 		},
 
 		model: Request,
-		url: '/api/requests'
-
 	});
 
 	return Queue;

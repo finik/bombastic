@@ -36,17 +36,9 @@ exports.schedule = function(request, callback) {
 	});
 };
 
-exports.getQueue = function(project_id, callback) {
-	queue.find({pending: true, project: project_id}).sort({date: -1}).toArray(function(err, pending) {
-		queue.find({pending: false, project: project_id}).sort({date: -1}).limit(10).toArray(function(err, processed) {
-			callback(pending, processed);
-		});
-	});
-};
-
-exports.getPendingQueue = function(project_id, callback) {
-	queue.find({pending: true, project: project_id}).sort({date: -1}).toArray(function(err, pending) {
-		callback(err, pending);
+exports.getQueue = function(project_id, pending, limit, callback) {
+	queue.find({pending: pending, project: project_id}).sort({date: -1}).limit(limit).toArray(function(err, queue) {
+		callback(err, queue);
 	});
 };
 

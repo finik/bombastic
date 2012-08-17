@@ -51,7 +51,7 @@ define(function(require) {
 
 		var manifest = new Manifest();
 		var changes = new Changes();
-		var queue = new Queue();
+		var queue = new Queue({url: '/api/requests'});
 
 		manifest.fetch({success: function(manifest, response){
 			var manifestView = new ManifestView({
