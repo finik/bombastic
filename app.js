@@ -107,15 +107,17 @@ exports.init = function() {
 			}
 		}
 
-		res.render('submit', {
-			title: config.title,
-			user: {
-				name: req.session.user.fullName,
-				email: req.session.user.mail,
-				admin: (req.session.project.admins.indexOf(req.session.user.mail) != -1)},
-			commit: commit,
-			projects: config.projects,
-			current: req.session.project.name,
+		git.head(req.session.project.manifestPath, function(commit) {
+			res.render('submit', {
+						title: config.title,
+						user: {
+							name: req.session.user.fullName,
+							email: req.session.user.mail,
+							admin: (req.session.project.admins.indexOf(req.session.user.mail) != -1)},
+						commit: commit,
+						projects: config.projects,
+						current: req.session.project.name,
+			});
 		});
 	});
 
