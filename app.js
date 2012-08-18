@@ -183,30 +183,31 @@ exports.init = function() {
 		request.project = req.session.project.name;
 		workqueue.schedule(request, function(err, id) {
 			jenkins.build(req.session.project.job, {BOMBASTIC_ID: id}, function(err, result) {
-				res.json({success: true});
+				request.id = id;
+				res.json(request);
 			});
 		});
 	});
 
 	// Delete
-	app.post('/api/requests/:id', function(req, res){
+	app.del('/api/requests/:id', function(req, res){
 		if (undefined === req.session.user) {
 			log.error('Unauthorized DELETE access to /api/requests/:id');
 			res.json({success: false});
 		}
 		log.warn('Deleting ' + req.params.id);
-		workqueue.delete(req.body.id, function(err) {
+		workqueue.delete(req.params.id, function(err) {
 			res.json({success: true});
 		});
 	});
 
 	// Approve (modify)
-	app.post('/api/approve', function(req, res){
+	app.put('/api/requests/:id', function(req, res){
 		if (undefined === req.session.user) {
 			log.error('Unauthorized POST access to /api/approve');
 			res.json({success: false});
 		}
-		id = req.body.id;
+		id = req.params.id;
 		log.warn('Force approving ' + id);
 		workqueue.get(id, function(err, request){
 			if (request === undefined) {
@@ -283,7 +284,9 @@ exports.init = function() {
 	});
 
 	app.del('/api/changes/:id', function(req, res){
+		log.warn('Deleting change' + req.params.id);
 		if (undefined !== req.session.changes[req.params.id]) {
+			req.session.changes[req.params.id] = undefined;
 			delete req.session.changes[req.params.id];
 			res.json({success: true});
 		}

@@ -2,6 +2,10 @@
 	<div class="span2">
 		<span class="id hide"><%= _id %></span>
 		<a href="/api/get/<%= _id %>" title="Generate XML" class="generate"><i class="icon-download-alt"></i></a>
+		<% if (true /*user.admin*/) { %>
+			<a href="#" title="Approve change now!" class="approve pull-right"><i class="icon-ok"></i></a>
+			<a href="#" title="Drop change" class="remove pull-right"><i class="icon-remove"></i></a><br>
+		<% } %>
 		<strong><a href="mailto:<%= author.email %>"><%= author.name %></a></strong><br>
 		<%= date.toTimeString() %><br>
 		<%= date.toDateString() %><br>

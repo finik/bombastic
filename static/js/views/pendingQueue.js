@@ -9,6 +9,8 @@ define(function(require){
 			this.collection.each(function(request) {
 				var view = new PendingRequestView({
 					model: request,
+					remove: that.options.remove,
+					approve: that.options.approve
 				});
 				that.$el.append(view.render().el);
 			});

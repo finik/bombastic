@@ -18,6 +18,25 @@ define(function(require){
 			$(this.el).html(this.template(json));
 			return this;
 		},
+
+		events: {
+			'click a.remove': 'remove',
+			'click a.approve': 'approve'
+		},
+
+		remove: function() {
+			$(this.el).hide('slow');
+			if (this.options.remove) {
+				this.options.remove(this.model);
+			}
+		},
+
+		approve: function() {
+			$(this.el).hide('slow');
+			if (this.options.approve) {
+				this.options.approve(this.model);
+			}
+		}
 	});
 
 	return PendingRequest;

@@ -18,6 +18,16 @@ define(function(require){
 			$(this.el).html(this.template(json));
 			return this;
 		},
+
+		events: {
+			'click a.resubmit': 'resubmit',
+		},
+
+		resubmit: function() {
+			if (this.options.resubmit) {
+				this.options.resubmit(this.model);
+			}
+		}
 	});
 
 	return ProcessedRequest;

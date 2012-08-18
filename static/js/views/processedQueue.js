@@ -9,6 +9,7 @@ define(function(require){
 			this.collection.each(function(request) {
 				var view = new ProcessedRequestView({
 					model: request,
+					resubmit: that.options.resubmit
 				});
 				that.$el.append(view.render().el);
 			});

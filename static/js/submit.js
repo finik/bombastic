@@ -168,22 +168,23 @@ define(function(require) {
 				return;
 			}
 
+			queue.on('sync', function(){
+				changes.on('remove', function() {
+					if (changes.length == 0) {
+						document.location.href = '/';
+					}
+				});
+				changes.each(function(change) {
+					change.destroy();
+				});
+			});
 			queue.create({
 				changes: changes.toJSON(),
 				message: message
-			},
-			{
-				wait: true
 			});
 
-			changes.each(function(change) {
-				change.destroy();
-			});
 
-			document.location.href = '/';
 		});
-
-
 	});
 });
 
