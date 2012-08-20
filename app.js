@@ -215,17 +215,14 @@ exports.init = function() {
 				return;
 			}
 			else {
-				commit(id, request, function(err) {
-					var job = {};
-					job.name = 'Manual force';
-					job.number = 0;
-					job.url = '';
-					request.job = job;
-					request.pending = false;
-					request.status = 'approved';
-					workqueue.updateRecord(id, request);
-					res.json({success: true});
-				});
+				var job = {};
+				job.name = 'Manual override';
+				job.number = 0;
+				job.url = '';
+				request.job = job;
+				request.status = 'approved';
+				workqueue.updateRecord(id, request);
+				res.json({success: true});
 			}
 
 		});
@@ -284,7 +281,7 @@ exports.init = function() {
 	});
 
 	app.del('/api/changes/:id', function(req, res){
-		log.warn('Deleting change' + req.params.id);
+		log.warn('Deleting change ' + req.params.id);
 		if (undefined !== req.session.changes[req.params.id]) {
 			req.session.changes[req.params.id] = undefined;
 			delete req.session.changes[req.params.id];

@@ -90,28 +90,28 @@ exports.applyChanges = function (manifest, request) {
 			case "ADD":
 				// TODO: error checking, does it already exist?
 				project = {};
-				project.name = change.name;
-				project.path = change.path;
-				project.groups = change.groups;
-				project.revision = change.revision;
-				project.remote = change.remote;
+				project.name = change.project.name;
+				project.path = change.project.path;
+				project.groups = change.project.groups;
+				project.revision = change.project.revision;
+				project.remote = change.project.remote;
 				projects.push(project);
 			break;
 
 			case "REMOVE":
 				// TODO: Error checking, is it really removing anything?
-				projects = projects.filter(function(v) { return v.name == change.name ? false : true;});
+				projects = projects.filter(function(v) { return v.name == change.project.name ? false : true;});
 				manifest.manifest.project = projects;
 			break;
 
 			case "MODIFY":
 				for (j in projects) {
 					project = projects[j];
-					if (change.name == project.name) {
-						project.path = change.path;
-						project.groups = change.groups;
-						project.revision = change.revision;
-						project.remote = change.remote;
+					if (change.project.name == project.name) {
+						project.path = change.project.path;
+						project.groups = change.project.groups;
+						project.revision = change.project.revision;
+						project.remote = change.project.remote;
 					}
 				}
 			break;

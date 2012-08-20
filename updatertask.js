@@ -22,6 +22,16 @@ commit = function(project, id, request, callback) {
 	});
 };
 
+handleApproved = function(project, id, request) {
+	// Now try to commit it
+	log.info('Trying to commit manifest change ' + id);
+	commit(project, id, request, function() {
+		request.pending = false;
+		request.status = 'commited';
+		workqueue.updateRecord(id, request);
+	});
+}
+
 update = function(project, id, request, build, workqueue) {
 	var hasChanged = false;
 	if (undefined === request.job) {
@@ -53,13 +63,7 @@ update = function(project, id, request, build, workqueue) {
 	}
 
 	if (request.status == 'approved') {
-		// Now try to commit it
-		log.info('Trying to commit manifest change ' + id);
-		commit(project, id, request, function() {
-			request.pending = false;
-			request.status = 'commited';
-			workqueue.updateRecord(id, request);
-		});
+		handleApproved(project, id, request);
 	} else {
 		workqueue.updateRecord(id, request);
 	}
@@ -71,6 +75,13 @@ updaterTask = function(project, timeout) {
 		if (err) {
 			log.error('Error getting pending list');
 		} else if (pending.length > 0) {
+			for (m in pending) {
+				request = pending[m];
+
+				if (request.status == 'approved') {
+					handleApproved(project, request._id.toString(), request);
+				}
+			}
 			jenkins.job(project.job, function(err, data) {
 				if (err) {
 					log.error('Error getting build list');
