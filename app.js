@@ -11,6 +11,75 @@ var updatertask = require('./updatertask');
 var config = require('./config');
 var log = require('./logger');
 
+generateChangesFromXML = function(product, url, callback){
+	request({
+		method: 'get',
+		uri: url,
+		qs: {}
+	}, function (err, result) {
+		if (err) {
+			log.err('Can not retrieve ' + req.query.url);
+			callback(err, []);
+			return;
+		}
+
+		manifest.readObject(product.manifestPath, product.manifestFile, function(err, ours){
+
+			if (err) {
+				callback(err, []);
+				return;
+			}
+
+			theirs = manifest.xml2object(result.body);
+			// Merge below is very ineffecient O(2*M*N), optimize later
+
+			var changes = [];
+
+			// First see if there are new projects upstream
+			_.each(theirs.manifest.project, function(their_project) {
+				var our_project = _.find(ours.manifest.project, function(project) {
+					return (project.name == their_project.name);
+				});
+
+				if (our_project === undefined) {
+					// Yes, we need to add a project
+					changes.push({
+						action: "ADD",
+						project: their_project,
+					});
+				}
+			});
+
+			_.each(ours.manifest.project, function(our_project) {
+				var their_project = _.find(theirs.manifest.project, function(project) {
+					return (project.name == our_project.name);
+				});
+
+				if (their_project === undefined) {
+					// Either we added a project or upstream deleted it,
+					// assume the latter
+					if (false == our_project.external) {
+						changes.push({
+							action: "REMOVE",
+							project: our_project,
+						});
+					}
+				} else {
+					if (false == _.isEqual(our_project, their_project)) {
+						// Project found, but it is different, update
+						changes.push({
+							action: "MODIFY",
+							project: their_project,
+							original: our_project
+						});
+					}
+				}
+			});
+			callback(err, changes);
+		});
+	});
+}
+
 exports.init = function() {
 
 	workqueue.init(function(err) {
@@ -271,12 +340,19 @@ exports.init = function() {
 	// /api/changes/*
 	///////////////////////////////////////////////////////
 	app.get('/api/changes', function(req, res) {
-		if (undefined !== req.session.changes) {
-			var keys = Object.keys(req.session.changes);
-			var values = keys.map(function(v) { return req.session.changes[v]; });
-			res.json(values);
+		if (req.query.url) {
+			generateChangesFromXML(req.session.project, req.query.url, function(err, changes){
+				res.json(changes);
+				return;
+			});
 		} else {
-			res.json([]);
+			if (undefined !== req.session.changes) {
+				var keys = Object.keys(req.session.changes);
+				var values = keys.map(function(v) { return req.session.changes[v]; });
+				res.json(values);
+			} else {
+				res.json([]);
+			}
 		}
 	});
 
@@ -326,27 +402,6 @@ exports.init = function() {
 					res.send(manifest.object2xml(data));
 				}
 			});
-		});
-	});
-
-	app.get('/api/clean', function(req, res){
-		// This doesn't have a session associated with it,
-		// it can't rely on any session variables, only on
-		// data that came with the request itself.
-		log.info('Someone is fetching a clean version of ' + req.query.url);
-		request({
-			method: 'get',
-			uri: req.query.url,
-			qs: {}
-		}, function (err, result) {
-			if (err) {
-				log.err('Can not retrieve ' + req.query.url);
-			} else {
-				data = manifest.xml2object(result.body);
-				// Convert back to xml and send
-				res.header('Content-Type', 'text/xml');
-				res.send(manifest.object2xml(data));
-			}
 		});
 	});
 
