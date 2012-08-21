@@ -43,6 +43,7 @@ define(function(require) {
 	var ManifestView = require('views/manifest');
 	var AddProjectView = require('views/add');
 	var ModifyProjectView = require('views/modify');
+	var ImportChangesView = require('views/import');
 	var Changes = require('collections/changes');
 	var ChangesView = require('views/changes');
 	var Queue = require('collections/queue');
@@ -50,7 +51,7 @@ define(function(require) {
 	$(function() {
 
 		var manifest = new Manifest();
-		var changes = new Changes();
+		var changes = new Changes({url: '/api/changes'});
 		var queue = new Queue({url: '/api/requests'});
 
 		manifest.fetch({success: function(manifest, response){
@@ -153,6 +154,28 @@ define(function(require) {
 				});
 			}});
 			addProjectView.render().show();
+		});
+
+		$('#import-changes').click(function() {
+			var importChangesView = new ImportChangesView({success: function(url){
+				console.log(url);
+				var newChanges = new Changes({
+					url: '/api/changes?url=' + url
+				});
+				newChanges.on('all', function(event) {
+					console.log(event);
+				});
+				newChanges.fetch({success: function(newChanges, response){
+					console.log(newChanges);
+					changes.each(function(change) {
+						change.destroy();
+					});
+					newChanges.each(function(change){
+						changes.create(change.toJSON());
+					});
+				}});
+			}});
+			importChangesView.render().show();
 		});
 
 		$('#submit-bom').click(function() {
