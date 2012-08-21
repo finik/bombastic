@@ -1,5 +1,5 @@
 define(function(require){
-	
+
 	var Backbone = require('backbone');
 	var _ = require('underscore');
 	var Change = require('models/change');
@@ -15,7 +15,7 @@ define(function(require){
 		},
 
 		render: function() {
-			$(this.el).html(this.template(this.model.toJSON()));
+			$(this.el).html(this.template({change: this.model.toJSON()}));
 			return this;
 		},
 

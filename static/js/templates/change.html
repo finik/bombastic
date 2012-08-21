@@ -2,10 +2,34 @@
 	<div><a href="#" class="restore" title="Restore"><i class="icon-remove"></i></a></div>
 </td>
 <td class="action">
-	<div><%= action %></div>
+	<div><%= change.action %></div>
 </td>
-<td class="name"><%= project.name %></td>
-<td class="path"><%= (project.path)?project.path:"" %></td>
-<td class="groups"><%= (project.groups)?project.groups:"" %></td>
-<td class="remote"><%= (project.remote)?project.remote:"" %></td>
-<td class="revision"><%= (project.revision)?project.revision:"" %></td>
+<td class="name"><%= change.project.name %></td>
+<td class="path">
+	<%	if (change.original && change.project.path != change.original.path) { %>
+		<span title="was: <%= change.original.path %>" style="cursor:help;color:red"><%= change.project.path?change.project.path:"removed" %></span>
+	<% } else { %>
+		<%= change.project.path?change.project.path:"" %>
+	<% } %>
+</td>
+<td class="groups">
+	<%	if (change.original && change.project.groups != change.original.groups) { %>
+		<span title="was: <%= change.original.groups %>" style="cursor:help;color:red"><%= change.project.groups?change.project.groups:"removed" %></span>
+	<% } else { %>
+		<%= change.project.groups?change.project.groups:"" %>
+	<% } %>
+</td>
+<td class="remote">
+	<%	if (change.original && change.project.remote != change.original.remote) { %>
+		<span title="was: <%= change.original.remote %>" style="cursor:help;color:red"><%= change.project.remote?change.project.remote:"removed" %></span>
+	<% } else { %>
+		<%= change.project.remote?change.project.remote:"" %>
+	<% } %>
+</td>
+<td class="revision">
+	<%	if (change.original && change.project.revision != change.original.revision) { %>
+		<span title="was: <%= change.original.revision %>" style="cursor:help;color:red"><%= change.project.revision?change.project.revision:"removed" %></span>
+	<% } else { %>
+		<%= change.project.revision?change.project.revision:"" %>
+	<% } %>
+</td>
