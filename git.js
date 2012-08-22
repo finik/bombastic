@@ -4,7 +4,7 @@ var fs = require('fs');
 var log = require('./logger');
 
 exports.head = function (path, callback) {
-	exec('git --git-dir=' + path + ".git log -1 --pretty=format:'%H%n%an <%ae>%n%ad%n%s%n'", function(error, stdout, stderr) {
+	exec('git --git-dir=' + path + ".git log -1 --pretty=format:'%H%n%an <%ae>%n%ad%n%s%n'", function(err, stdout, stderr) {
 		var str = stdout.split('\n');
 		var commit = {
 			commit: str[0],
@@ -12,9 +12,15 @@ exports.head = function (path, callback) {
 			date: str[2],
 			message: str[3]
 		};
-		callback(commit);
+		callback(err, commit);
 	});
 };
+
+exports.get = function(path, file, revision, callback) {
+	exec('git --git-dir=' + path + ".git show "+revision+":"+file, function(err, stdout, stderr) {
+		callback(err, stdout);
+	});
+}
 
 exports.commit = function (path, author, message, callback) {
 	temp.open('bombastic', function(err, info) {

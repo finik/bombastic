@@ -176,7 +176,7 @@ exports.init = function() {
 			}
 		}
 
-		git.head(req.session.project.manifestPath, function(commit) {
+		git.head(req.session.project.manifestPath, function(err, commit) {
 			res.render('submit', {
 						title: config.title,
 						user: {
@@ -390,18 +390,33 @@ exports.init = function() {
 
 			var project = config.projects[request.project];
 
-			manifest.readObject(project.manifestPath, project.manifestFile, function(err, data){
-				if(err) {
-					log.error("Could not open file: " + err);
-					return;
-				}
+			if (request.commit) {
+				// This request was commited already, so we retrieve it from git
+				log.info('Fetching manifest for ' + req.params.id + ' from git SHA1 ' + request.commit.commit);
+				git.get(project.manifestPath, project.manifestFile, request.commit.commit, function(err, data) {
+					if(err) {
+						log.error("Could not open file: " + err);
+						return;
+					}
 
-				if (true === manifest.applyChanges(data, request)) {
-					// Convert back to xml and send
 					res.header('Content-Type', 'text/xml');
-					res.send(manifest.object2xml(data));
-				}
-			});
+					res.send(data);
+				});
+			} else {
+				// Generate it by taking top of tree and applying the changes.
+				manifest.readObject(project.manifestPath, project.manifestFile, function(err, data){
+					if(err) {
+						log.error("Could not open file: " + err);
+						return;
+					}
+
+					if (true === manifest.applyChanges(data, request)) {
+						// Convert back to xml and send
+						res.header('Content-Type', 'text/xml');
+						res.send(manifest.object2xml(data));
+					}
+				});
+			}
 		});
 	});
 

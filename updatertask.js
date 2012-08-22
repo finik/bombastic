@@ -15,7 +15,7 @@ commit = function(project, id, request, callback) {
 		if (true === manifest.applyChanges(data, request)) {
 			manifest.writeObject(project.manifestPath, project.manifestFile, data, function() {
 				git.commit(project.manifestPath, request.author, request.message, function() {
-					callback();
+					callback(err);
 				});
 			});
 		}
@@ -25,10 +25,13 @@ commit = function(project, id, request, callback) {
 handleApproved = function(project, id, request) {
 	// Now try to commit it
 	log.info('Trying to commit manifest change ' + id);
-	commit(project, id, request, function() {
-		request.pending = false;
-		request.status = 'commited';
-		workqueue.updateRecord(id, request);
+	commit(project, id, request, function(err) {
+		git.head(project.manifestPath, function(err, commitInfo){
+			request.pending = false;
+			request.status = 'commited';
+			request.commit = commitInfo;
+			workqueue.updateRecord(id, request);
+		});
 	});
 }
 
