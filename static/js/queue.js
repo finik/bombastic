@@ -29,10 +29,11 @@ define(function(require) {
 	var Queue = require('collections/queue');
 	var PendingQueueView = require('views/pendingQueue');
 	var ProcessedQueueView = require('views/processedQueue');
+	var Changes = require('collections/changes');
 	require('bootstrap');
 
 	$(function() {
-
+		var changes = new Changes({url: '/api/changes'});
 		var pendingQueue = new Queue({
 			url: '/api/requests'
 		});
@@ -57,7 +58,11 @@ define(function(require) {
 				collection: processedQueue,
 				el: '#processed-queue',
 				resubmit: function(request) {
-					alert('resubmit');
+					_.each(request.get('changes'), function(change) {
+						delete change.id;
+						changes.create(change);
+					});
+					document.location.href = '/submit';
 				}
 			});
 		}});
