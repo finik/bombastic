@@ -12,7 +12,14 @@ define(function(require){
 			});
 		},
 
-		model: Change,
+		empty: function() {
+			while (this.length) {
+				var change = this.pop();
+				change.destroy();
+			}
+		},
+
+		model: Change
 	});
 
 	return Changes;

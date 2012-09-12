@@ -167,9 +167,8 @@ define(function(require) {
 				});
 				newChanges.fetch({success: function(newChanges, response){
 					console.log(newChanges);
-					changes.each(function(change) {
-						change.destroy();
-					});
+					changes.empty();
+
 					newChanges.each(function(change){
 						changes.create(change.toJSON());
 					});
@@ -197,9 +196,7 @@ define(function(require) {
 						document.location.href = '/';
 					}
 				});
-				changes.each(function(change) {
-					change.destroy();
-				});
+				changes.empty();
 			});
 			queue.create({
 				changes: changes.toJSON(),

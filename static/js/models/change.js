@@ -3,6 +3,8 @@ define(function(require){
 	var Backbone = require('backbone');
 
 	Change = Backbone.Model.extend({
+		urlRoot: '/api/changes',
+
 		initialize: function() {
 			this.on("all", function(event) {
 				console.log(event);
