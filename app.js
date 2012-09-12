@@ -22,7 +22,6 @@ generateChangesFromXML = function(product, url, callback){
 			callback(err, []);
 			return;
 		}
-
 		manifest.readObject(product.manifestPath, product.manifestFile, function(err, ours){
 
 			if (err) {
@@ -30,9 +29,8 @@ generateChangesFromXML = function(product, url, callback){
 				return;
 			}
 
-			theirs = manifest.xml2object(result.body);
+			var theirs = manifest.xml2object(result.body);
 			// Merge below is very ineffecient O(2*M*N), optimize later
-
 			var changes = [];
 
 			// First see if there are new projects upstream
@@ -49,7 +47,6 @@ generateChangesFromXML = function(product, url, callback){
 					});
 				}
 			});
-
 			_.each(ours.manifest.project, function(our_project) {
 				var their_project = _.find(theirs.manifest.project, function(project) {
 					return (project.name == our_project.name);
@@ -243,7 +240,7 @@ exports.init = function() {
 			res.json({success: false});
 		}
 
-		request = req.body;
+		var request = req.body;
 		request.pending = true;
 		request.status = 'waiting';
 		request.author = {};
