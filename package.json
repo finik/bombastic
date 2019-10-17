@@ -20,7 +20,7 @@
   "author": "Dmitry Fink",
   "license": "BSD",
   "dependencies": {
-    "express": "2.5.10",
+    "express": "4.17.1",
     "winston": "0.6.2",
     "ejs": "0.7.2",
     "xml2json": "git://github.com/finik/node-xml2json.git#5051c6513ba35b9499d1ab8b40f430897a338102",
